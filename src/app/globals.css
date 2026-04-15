@@ -1,5 +1,97 @@
 @import "@heroui/styles/css";
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  --carbon: #161616;
+  --bolivar: #2D3B44;
+  --cambio: #8E9399;
+  --claro: #EEEEEE;
+  --rial: #ACE524;
+
+  --font-body: "Google Sans", "Google Sans Text", system-ui, sans-serif;
+
+  --accent: #ACE524;
+  --accent-foreground: #161616;
+  --focus: var(--accent);
+  --background: #ffffff;
+}
+
+.dark,
+[data-theme="dark"] {
+  --accent: #ACE524;
+  --accent-foreground: #161616;
+}
+
+@theme inline {
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-carbon: #161616;
+  --color-bolivar: #2D3B44;
+  --color-cambio: #8E9399;
+  --color-claro: #EEEEEE;
+  --color-rial: #ACE524;
+}
+
+/* All text: OpenType contextual alternates */
+* {
+  font-feature-settings: "calt";
+}
+
+/* Display headings — Sora ExtraBold 800, tight */
+.display-heading {
+  font-family: var(--font-sora), sans-serif;
+  font-weight: 800;
+  line-height: 0.95;
+  color: var(--carbon);
+}
+
+/* Pill button base */
+.btn-pill {
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: transform 150ms ease;
+}
+.btn-pill:hover {
+  transform: scale(1.05);
+}
+.btn-pill:active {
+  transform: scale(0.95);
+}
+
+/* Primary green pill */
+.btn-primary {
+  background-color: var(--rial);
+  color: var(--carbon);
+  padding: 5px 16px;
+}
+
+/* Secondary subtle pill */
+.btn-secondary {
+  background-color: rgba(22, 22, 22, 0.08);
+  color: var(--carbon);
+  padding: 8px 12px 8px 16px;
+}
+
+/* Ring shadow for cards */
+.ring-shadow {
+  box-shadow: rgba(22, 22, 22, 0.12) 0px 0px 0px 1px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(12px); }
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
 }
