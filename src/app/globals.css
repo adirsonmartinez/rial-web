@@ -1,5 +1,7 @@
 @import "@heroui/styles/css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --carbon: #161616;
   --bolivar: #2D3B44;
@@ -12,13 +14,45 @@
   --accent: #ACE524;
   --accent-foreground: #161616;
   --focus: var(--accent);
-  --background: #ffffff;
+
+  /* Theme tokens */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f7f5;
+  --bg-card: #ffffff;
+  --text-primary: #161616;
+  --text-secondary: #2D3B44;
+  --text-muted: #8E9399;
+  --text-on-accent: #161616;
+  --border: rgba(22, 22, 22, 0.12);
+  --card-bg-subtle: rgba(22, 22, 22, 0.06);
+  --card-bg-hover: rgba(22, 22, 22, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(22, 22, 22, 0.08);
+  --navbar-bg: rgba(255, 255, 255, 0.8);
+  --hero-glow-1: rgba(172, 229, 36, 0.2);
+  --hero-glow-2: rgba(172, 229, 36, 0.1);
 }
 
 .dark,
 [data-theme="dark"] {
   --accent: #ACE524;
   --accent-foreground: #161616;
+
+  --bg-primary: #0e0e0e;
+  --bg-secondary: #161616;
+  --bg-card: #1c1c1c;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --text-on-accent: #161616;
+  --border: rgba(255, 255, 255, 0.1);
+  --card-bg-subtle: rgba(255, 255, 255, 0.05);
+  --card-bg-hover: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --navbar-bg: rgba(14, 14, 14, 0.8);
+  --hero-glow-1: rgba(172, 229, 36, 0.12);
+  --hero-glow-2: rgba(172, 229, 36, 0.06);
 }
 
 @theme inline {
@@ -41,7 +75,7 @@
   font-family: var(--font-sora), sans-serif;
   font-weight: 800;
   line-height: 0.95;
-  color: var(--carbon);
+  color: var(--text-primary);
 }
 
 /* Pill button base */
@@ -61,20 +95,20 @@
 /* Primary green pill */
 .btn-primary {
   background-color: var(--rial);
-  color: var(--carbon);
+  color: var(--text-on-accent);
   padding: 5px 16px;
 }
 
 /* Secondary subtle pill */
 .btn-secondary {
-  background-color: rgba(22, 22, 22, 0.08);
-  color: var(--carbon);
+  background-color: var(--card-bg-hover);
+  color: var(--text-primary);
   padding: 8px 12px 8px 16px;
 }
 
 /* Ring shadow for cards */
 .ring-shadow {
-  box-shadow: rgba(22, 22, 22, 0.12) 0px 0px 0px 1px;
+  box-shadow: var(--border) 0px 0px 0px 1px;
 }
 
 @keyframes float {

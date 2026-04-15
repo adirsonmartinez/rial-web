@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Dropdown, Label, Link } from "@heroui/react";
 import { ChartColumn, CreditCard, Layers, Calculator, TargetDart, CircleQuestion, CircleInfo } from "@gravity-ui/icons";
+import { ThemeToggle } from "@/views/shared/ThemeToggle";
 
 const PRODUCT_ITEMS = [
   { id: "budgets", label: "Presupuestos", icon: ChartColumn },
@@ -20,7 +21,7 @@ const LEARN_ITEMS = [
 
 function ChevronDown() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#8E9399]">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: "var(--text-muted)" }}>
       <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -49,10 +50,21 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
   const [learnOpen, setLearnOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <>
-    <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-md" style={{ boxShadow: "rgba(22,22,22,0.12) 0px 0px 0px 1px" }}>
+    <header
+      className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled ? "backdrop-blur-md" : "bg-transparent"}`}
+      style={scrolled ? { backgroundColor: "var(--navbar-bg)", boxShadow: "var(--border) 0px 0px 0px 1px" } : undefined}
+    >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <div className="flex items-center gap-10">
           <Link href="/" className="no-underline">
@@ -76,7 +88,7 @@ export function Navbar() {
           <ul className="hidden items-center gap-6 md:flex">
             <li>
               <Dropdown>
-                <Dropdown.Trigger className="flex items-center gap-1 text-sm font-medium text-[#2D3B44] hover:text-[#161616] cursor-pointer">
+                <Dropdown.Trigger className="flex items-center gap-1 text-sm font-medium cursor-pointer" style={{ color: "var(--text-secondary)" }}>
                   Producto
                   <ChevronDown />
                 </Dropdown.Trigger>
@@ -84,7 +96,7 @@ export function Navbar() {
                   <Dropdown.Menu onAction={(key) => console.log(key)}>
                     {PRODUCT_ITEMS.map((item) => (
                       <Dropdown.Item key={item.id} id={item.id} textValue={item.label}>
-                        <item.icon className="size-4 shrink-0 text-[#8E9399]" />
+                        <item.icon className="size-4 shrink-0" style={{ color: "var(--text-muted)" }} />
                         <Label>{item.label}</Label>
                       </Dropdown.Item>
                     ))}
@@ -94,7 +106,7 @@ export function Navbar() {
             </li>
             <li>
               <Dropdown>
-                <Dropdown.Trigger className="flex items-center gap-1 text-sm font-medium text-[#2D3B44] hover:text-[#161616] cursor-pointer">
+                <Dropdown.Trigger className="flex items-center gap-1 text-sm font-medium cursor-pointer" style={{ color: "var(--text-secondary)" }}>
                   Aprende
                   <ChevronDown />
                 </Dropdown.Trigger>
@@ -102,7 +114,7 @@ export function Navbar() {
                   <Dropdown.Menu onAction={(key) => console.log(key)}>
                     {LEARN_ITEMS.map((item) => (
                       <Dropdown.Item key={item.id} id={item.id} textValue={item.label}>
-                        <item.icon className="size-4 shrink-0 text-[#8E9399]" />
+                        <item.icon className="size-4 shrink-0" style={{ color: "var(--text-muted)" }} />
                         <Label>{item.label}</Label>
                       </Dropdown.Item>
                     ))}
@@ -111,7 +123,7 @@ export function Navbar() {
               </Dropdown>
             </li>
             <li>
-              <button className="flex items-center gap-1 text-sm font-medium text-[#2D3B44] hover:text-[#161616] cursor-pointer">
+              <button className="flex items-center gap-1 text-sm font-medium cursor-pointer" style={{ color: "var(--text-secondary)" }}>
                 Nosotros
               </button>
             </li>
@@ -119,6 +131,7 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle />
           <button className="btn-pill btn-secondary cursor-pointer text-sm" style={{ padding: "8px 16px" }}>
             Ingresar
           </button>
@@ -127,13 +140,17 @@ export function Navbar() {
           </button>
         </div>
 
-        <button
-          className="flex items-center text-[#161616] md:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Menú"
-        >
-          {mobileMenuOpen ? <CloseIcon /> : <HamburgerIcon />}
-        </button>
+        <div className="flex items-center gap-3 md:hidden">
+          <ThemeToggle />
+          <button
+            className="flex items-center"
+            style={{ color: "var(--text-primary)" }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menú"
+          >
+            {mobileMenuOpen ? <CloseIcon /> : <HamburgerIcon />}
+          </button>
+        </div>
       </nav>
     </header>
 
@@ -144,23 +161,26 @@ export function Navbar() {
       onClick={() => setMobileMenuOpen(false)}
     />
     <div
-      className="fixed left-0 right-0 top-16 z-50 bg-white px-6 pb-6 rounded-b-[30px] md:hidden"
+      className="fixed left-0 right-0 top-16 z-50 px-6 pb-6 rounded-b-[30px] md:hidden"
       style={{
         clipPath: mobileMenuOpen ? "inset(0 0 0 0)" : "inset(0 0 100% 0)",
         transition: "clip-path 300ms ease-in-out",
-        boxShadow: "rgba(22,22,22,0.12) 0px 0px 0px 1px",
+        backgroundColor: "var(--bg-card)",
+        boxShadow: "var(--border) 0px 0px 0px 1px",
       }}
     >
         <div className="flex flex-col gap-4 pt-4">
           <div>
             <button
-              className="flex w-full items-center justify-between py-2 text-sm font-medium text-[#2D3B44]"
+              className="flex w-full items-center justify-between py-2 text-sm font-medium"
+              style={{ color: "var(--text-secondary)" }}
               onClick={() => setProductOpen(!productOpen)}
             >
               Producto
               <svg
                 width="12" height="12" viewBox="0 0 12 12" fill="none"
-                className={`text-[#8E9399] transition-transform ${productOpen ? "rotate-180" : ""}`}
+                className={`transition-transform ${productOpen ? "rotate-180" : ""}`}
+                style={{ color: "var(--text-muted)" }}
               >
                 <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -172,8 +192,8 @@ export function Navbar() {
               <div className="overflow-hidden">
                 <div className="flex flex-col gap-2 pl-4 pt-1">
                   {PRODUCT_ITEMS.map((item) => (
-                    <button key={item.id} className="flex items-center gap-3 py-2 text-sm text-[#2D3B44]">
-                      <item.icon className="size-4 shrink-0 text-[#8E9399]" />
+                    <button key={item.id} className="flex items-center gap-3 py-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+                      <item.icon className="size-4 shrink-0" style={{ color: "var(--text-muted)" }} />
                       {item.label}
                     </button>
                   ))}
@@ -184,13 +204,15 @@ export function Navbar() {
 
           <div>
             <button
-              className="flex w-full items-center justify-between py-2 text-sm font-medium text-[#2D3B44]"
+              className="flex w-full items-center justify-between py-2 text-sm font-medium"
+              style={{ color: "var(--text-secondary)" }}
               onClick={() => setLearnOpen(!learnOpen)}
             >
               Aprende
               <svg
                 width="12" height="12" viewBox="0 0 12 12" fill="none"
-                className={`text-[#8E9399] transition-transform ${learnOpen ? "rotate-180" : ""}`}
+                className={`transition-transform ${learnOpen ? "rotate-180" : ""}`}
+                style={{ color: "var(--text-muted)" }}
               >
                 <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -202,8 +224,8 @@ export function Navbar() {
               <div className="overflow-hidden">
                 <div className="flex flex-col gap-2 pl-4 pt-1">
                   {LEARN_ITEMS.map((item) => (
-                    <button key={item.id} className="flex items-center gap-3 py-2 text-sm text-[#2D3B44]">
-                      <item.icon className="size-4 shrink-0 text-[#8E9399]" />
+                    <button key={item.id} className="flex items-center gap-3 py-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+                      <item.icon className="size-4 shrink-0" style={{ color: "var(--text-muted)" }} />
                       {item.label}
                     </button>
                   ))}
@@ -212,11 +234,11 @@ export function Navbar() {
             </div>
           </div>
 
-          <button className="py-2 text-left text-sm font-medium text-[#2D3B44]">
+          <button className="py-2 text-left text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
             Nosotros
           </button>
 
-          <div className="flex flex-col gap-3 pt-4" style={{ borderTop: "1px solid rgba(22,22,22,0.12)" }}>
+          <div className="flex flex-col gap-3 pt-4" style={{ borderTop: "1px solid var(--border)" }}>
             <button className="btn-pill btn-secondary w-full cursor-pointer text-sm" style={{ padding: "12px 16px" }}>
               Ingresar
             </button>
