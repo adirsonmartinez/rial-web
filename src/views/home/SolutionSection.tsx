@@ -1,46 +1,63 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 const SEGMENTS = [
   {
-    id: "personas",
-    label: "Personas",
+    id: "organizar",
+    label: "Organizar",
     description:
-      "Organiza tus ingresos y gastos en bolívares, dólares y euros desde un solo lugar. Con Rial tienes el control total de tu dinero sin importar la moneda.",
+      "Registra y visualiza todos tus ingresos y gastos en un solo lugar. Sabe exactamente a dónde va cada rial.",
+    image: "https://images.unsplash.com/photo-1506784242126-2a0b0b89c56a?w=1200&q=80&auto=format&fit=crop",
+    imageAlt: "Planificador con pluma sobre un escritorio",
   },
   {
-    id: "emprendedores",
-    label: "Emprendedores",
+    id: "ahorrar",
+    label: "Ahorrar",
     description:
-      "Lleva las finanzas de tu negocio con claridad. Separa lo personal de lo profesional, registra ingresos por cliente y controla cada bolívar que entra y sale.",
+      "Define metas, crea presupuestos y haz seguimiento de tu progreso para alcanzar tus objetivos financieros.",
+    image: "https://images.unsplash.com/photo-1488398729765-41b1c297157d?w=1200&q=80&auto=format&fit=crop",
+    imageAlt: "Alcancía blanca junto a monedas apiladas",
   },
   {
-    id: "familias",
-    label: "Familias",
+    id: "convertir",
+    label: "Convertir",
     description:
-      "Gestiona el presupuesto familiar entre todos. Define metas de ahorro compartidas, asigna presupuestos por categoría y mantén a todos en la misma página.",
+      "Gestiona bolívares, dólares y euros con tasas actualizadas. Siempre sabrás cuánto vale tu dinero.",
+    image: "https://images.unsplash.com/photo-1764865988307-a7abe207fa1d?w=1200&q=80&auto=format&fit=crop",
+    imageAlt: "Billetes de dólares y euros sobre una superficie",
   },
 ];
 
 export function SolutionSection() {
-  const [activeId, setActiveId] = useState("personas");
+  const [activeId, setActiveId] = useState("organizar");
   const active = SEGMENTS.find((s) => s.id === activeId)!;
 
   return (
     <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div className="relative mx-auto max-w-7xl px-6 lg:min-h-[720px]">
         {/* Title — top left */}
-        <p className="text-sm font-medium mb-10" style={{ color: "var(--text-muted)" }}>¿Para quién es Rial?</p>
+        <div className="flex items-center gap-2 mb-10">
+          <div className="h-2.5 w-2.5 rounded-full bg-[#ACE524]" />
+          <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>¿Qué puedes hacer con Rial?</p>
+        </div>
 
         {/* Image — top right, aligned with title */}
         <div className="relative mb-10 lg:absolute lg:top-0 lg:right-6 lg:w-[48%] lg:mb-0">
-          <div className="relative flex w-full rounded-[30px] h-[450px] lg:h-[720px] items-center justify-center" style={{ backgroundColor: "var(--card-bg-subtle)" }}>
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-muted)", opacity: 0.4 }}>
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
+          <div className="relative w-full overflow-hidden rounded-[30px] h-[450px] lg:h-[720px]" style={{ backgroundColor: "var(--card-bg-subtle)" }}>
+            {SEGMENTS.map((segment) => (
+              <Image
+                key={segment.id}
+                src={segment.image}
+                alt={segment.imageAlt}
+                fill
+                sizes="(min-width: 1024px) 48vw, 100vw"
+                priority={segment.id === "organizar"}
+                className="object-cover transition-opacity duration-500 ease-out"
+                style={{ opacity: segment.id === activeId ? 1 : 0 }}
+              />
+            ))}
           </div>
         </div>
 

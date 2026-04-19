@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
+
 const TEAM = [
-  { name: "Carlos Méndez", role: "CEO & Co-founder", linkedin: "#" },
-  { name: "Valentina Rojas", role: "CTO & Co-founder", linkedin: "#" },
-  { name: "Andrés Pacheco", role: "Head of Product", linkedin: "#" },
-  { name: "María Guzmán", role: "Head of Design", linkedin: "#" },
+  { name: "Rafael Graziani", role: "CEO & Co-founder", linkedin: "https://www.linkedin.com/in/ragraziani", photo: "/founders/rafael-graziani.png" },
+  { name: "Anselmo Velazco", role: "CFO & Co-founder", linkedin: "https://www.linkedin.com/in/anselmo-velazco", photo: "/founders/anselmo-velazco.png" },
+  { name: "Adirson Martinez", role: "CTO & Co-founder", linkedin: "https://www.linkedin.com/in/martinezadirson", photo: "/founders/adirson-martinez.png" },
+  { name: "Inaki Umerez", role: "CMO & Co-founder", linkedin: "https://www.linkedin.com/in/i%C3%B1aki-um%C3%A9rez-su%C3%A9-98a393209", photo: "/founders/inaki-umerez.png" },
 ];
 
 function LinkedInIcon() {
@@ -28,7 +30,7 @@ export function TeamSection() {
             </p>
           </div>
           <h2 className="display-heading text-[clamp(2rem,4vw,3rem)]">
-            Las personas detrás de Rial
+            Los que hacen Rial posible
           </h2>
           <p className="max-w-md text-sm lg:text-base" style={{ lineHeight: 1.6, color: "var(--text-secondary)" }}>
             Un equipo apasionado por transformar la forma en que los venezolanos manejan su dinero.
@@ -43,15 +45,24 @@ export function TeamSection() {
               className="group flex flex-col overflow-hidden rounded-[24px]"
               style={{ backgroundColor: "var(--bg-card)", boxShadow: "var(--border) 0px 0px 0px 1px" }}
             >
-              {/* Photo placeholder */}
+              {/* Photo */}
               <div
-                className="relative flex h-[220px] lg:h-[280px] items-center justify-center"
+                className="relative flex h-[280px] lg:h-[340px] items-center justify-center overflow-hidden"
                 style={{ backgroundColor: "var(--card-bg-subtle)" }}
               >
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-muted)", opacity: 0.3 }}>
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
+                {member.photo ? (
+                  <Image
+                    src={member.photo}
+                    alt={member.name}
+                    fill
+                    className="object-cover object-top"
+                  />
+                ) : (
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-muted)", opacity: 0.3 }}>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                )}
               </div>
 
               {/* Info */}

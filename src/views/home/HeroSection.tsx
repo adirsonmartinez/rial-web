@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { AppStoreBadge, GooglePlayBadge } from "./StoreBadges";
 import { LogoCarousel } from "./LogoCarousel";
+import { useUserCount, formatExactCount } from "@/views/shared/useUserCount";
 
 const AVATARS = [
   "https://i.pravatar.cc/40?img=1",
@@ -12,6 +13,7 @@ const AVATARS = [
 ];
 
 export function HeroSection() {
+  const count = useUserCount();
   return (
     <section className="relative w-full overflow-hidden" style={{ backgroundColor: "var(--bg-primary)" }}>
       {/* Green glow accents */}
@@ -42,14 +44,14 @@ export function HeroSection() {
                 alt="Innoven"
                 width={80}
                 height={20}
-                className="block dark:hidden"
+                className="block dark:hidden h-auto"
               />
               <Image
                 src="/logos/innoven-white.svg"
                 alt="Innoven"
                 width={80}
                 height={20}
-                className="hidden dark:block"
+                className="hidden dark:block h-auto"
               />
             </a>
           </div>
@@ -78,7 +80,16 @@ export function HeroSection() {
                 ))}
               </div>
               <div className="h-8 w-px" style={{ backgroundColor: "var(--border)" }} />
-              <p className="text-sm font-medium lg:text-lg" style={{ color: "var(--text-primary)" }}>+40K usuarios registrados</p>
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+                </span>
+                <p className="text-sm font-medium tabular-nums lg:text-lg" style={{ color: "var(--text-primary)" }}>
+                  <span className="font-[family-name:var(--font-sora)] font-[800]">{formatExactCount(count)}</span>
+                  {" "}usuarios registrados
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -104,6 +115,7 @@ export function HeroSection() {
                 src="/hero-img.avif"
                 alt="Persona usando Rial"
                 fill
+                sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 480px"
                 className="object-cover"
                 priority
               />

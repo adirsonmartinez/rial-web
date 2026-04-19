@@ -1,13 +1,21 @@
 "use client";
 
-const STATS = [
-  { value: "+40K", label: "usuarios registrados" },
+import { useUserCount, formatMilestone } from "@/views/shared/useUserCount";
+
+const STATIC_STATS = [
   { value: "3", label: "monedas soportadas" },
-  { value: "10+", label: "bancos conectados" },
+  { value: "100%", label: "gratis para empezar" },
   { value: "24/7", label: "disponibilidad total" },
 ];
 
 export function StatsSection() {
+  const count = useUserCount();
+
+  const stats = [
+    { value: formatMilestone(count), label: "usuarios registrados" },
+    ...STATIC_STATS,
+  ];
+
   return (
     <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div className="mx-auto max-w-4xl px-6">
@@ -27,7 +35,7 @@ export function StatsSection() {
 
         {/* Stats row */}
         <div className="grid grid-cols-2 lg:grid-cols-4">
-          {STATS.map((stat, i) => (
+          {stats.map((stat, i) => (
             <div
               key={stat.label}
               className="flex flex-col items-center gap-3 py-8 lg:py-0"

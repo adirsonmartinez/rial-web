@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       { hostname: "i.pravatar.cc" },
       { hostname: "developer.apple.com" },
       { hostname: "upload.wikimedia.org" },
+      { hostname: "images.unsplash.com" },
     ],
   },
 };

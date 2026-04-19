@@ -32,6 +32,8 @@ const FEATURES = [
 export function FeaturesSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStart = useRef({ x: 0, scrollLeft: 0 });
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -47,6 +49,24 @@ export function FeaturesSection() {
     handleScroll();
     return () => el.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setIsDragging(true);
+    dragStart.current = { x: e.pageX, scrollLeft: el.scrollLeft };
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    e.preventDefault();
+    const dx = e.pageX - dragStart.current.x;
+    el.scrollLeft = dragStart.current.scrollLeft - dx;
+  };
+
+  const onMouseUp = () => setIsDragging(false);
 
   return (
     <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-secondary)" }}>
@@ -79,8 +99,12 @@ export function FeaturesSection() {
           <div className="flex flex-col gap-6 lg:w-[65%]">
             <div
               ref={scrollRef}
-              className="relative flex gap-4 overflow-x-auto py-1 pb-4 px-1"
-              style={{ scrollbarWidth: "none" }}
+              className="relative flex gap-4 overflow-x-auto py-1 pb-4 px-1 select-none"
+              style={{ scrollbarWidth: "none", cursor: isDragging ? "grabbing" : "grab" }}
+              onMouseDown={onMouseDown}
+              onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp}
+              onMouseLeave={onMouseUp}
             >
               {FEATURES.map((feature) => (
                 <div

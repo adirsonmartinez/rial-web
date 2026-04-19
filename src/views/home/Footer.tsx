@@ -45,6 +45,7 @@ export function Footer() {
               alt="Rial"
               width={90}
               height={36}
+              className="h-auto"
             />
             <p className="text-sm text-white/50" style={{ lineHeight: 1.6 }}>
               La app de finanzas personales para Venezuela. Organiza, ahorra y gestiona tu dinero en bolívares, dólares y euros.
@@ -116,11 +117,25 @@ export function Footer() {
         {/* Divider */}
         <div className="my-10" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }} />
 
-        {/* Bottom: copyright + social */}
+        {/* Bottom: copyright + venflow + social */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-xs text-white/30">
-            © {new Date().getFullYear()} Rial. Todos los derechos reservados.
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-white/30">
+              © {new Date().getFullYear()} Rial. Todos los derechos reservados.
+            </p>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-white/30">Pagos por</span>
+              <a href="https://www.venflow.app/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80">
+                <Image
+                  src="/logos/venflow-white.png"
+                  alt="Venflow"
+                  width={60}
+                  height={16}
+                  className="h-auto opacity-40 hover:opacity-70 transition-opacity"
+                />
+              </a>
+            </div>
+          </div>
           <div className="flex gap-3">
             {[
               { label: "Instagram", path: "M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" },

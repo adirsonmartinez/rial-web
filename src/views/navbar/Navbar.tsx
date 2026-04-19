@@ -73,7 +73,7 @@ export function Navbar() {
               alt="Rial"
               width={90}
               height={36}
-              className="block dark:hidden"
+              className="block dark:hidden h-auto"
               priority
             />
             <Image
@@ -81,7 +81,7 @@ export function Navbar() {
               alt="Rial"
               width={90}
               height={36}
-              className="hidden dark:block"
+              className="hidden dark:block h-auto"
               priority
             />
           </Link>
