@@ -1,13 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { ComponentType, CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Dropdown, Label } from "@heroui/react";
 import { ChartColumn, CreditCard, Layers, Calculator, TargetDart, CircleQuestion, CircleInfo } from "@gravity-ui/icons";
 import { ThemeToggle } from "@/views/shared/ThemeToggle";
 
-const PRODUCT_ITEMS = [
+type MenuItem = {
+  id: string;
+  label: string;
+  icon: ComponentType<{ className?: string; style?: CSSProperties }>;
+};
+
+const PRODUCT_ITEMS: MenuItem[] = [
   { id: "budgets", label: "Presupuestos", icon: ChartColumn },
   { id: "accounts", label: "Cuentas", icon: CreditCard },
   { id: "templates", label: "Plantillas", icon: Layers },
@@ -15,7 +21,7 @@ const PRODUCT_ITEMS = [
   { id: "goals", label: "Metas", icon: TargetDart },
 ];
 
-const LEARN_ITEMS = [
+const LEARN_ITEMS: MenuItem[] = [
   { id: "faq", label: "Preguntas frecuentes", icon: CircleQuestion },
   { id: "help-center", label: "Centro de ayuda", icon: CircleInfo },
 ];
@@ -44,6 +50,76 @@ function CloseIcon() {
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
+  );
+}
+
+function HoverDropdown({ label, items }: { label: string; items: MenuItem[] }) {
+  const [open, setOpen] = useState(false);
+  const timer = useRef<number | null>(null);
+
+  const openNow = () => {
+    if (timer.current) {
+      window.clearTimeout(timer.current);
+      timer.current = null;
+    }
+    setOpen(true);
+  };
+
+  const scheduleClose = () => {
+    if (timer.current) window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setOpen(false), 120);
+  };
+
+  useEffect(() => {
+    const t = timer;
+    return () => {
+      if (t.current) window.clearTimeout(t.current);
+    };
+  }, []);
+
+  return (
+    <li
+      className="relative"
+      onMouseEnter={openNow}
+      onMouseLeave={scheduleClose}
+    >
+      <button
+        type="button"
+        className="flex items-center gap-1 text-sm font-medium cursor-pointer"
+        style={{ color: "var(--text-secondary)" }}
+        aria-expanded={open}
+        aria-haspopup="menu"
+      >
+        {label}
+        <ChevronDown />
+      </button>
+      <div
+        role="menu"
+        className={`absolute left-0 top-full min-w-[240px] rounded-2xl p-1.5 transition-[opacity,transform] duration-150 ease-out ${
+          open
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-1 opacity-0"
+        }`}
+        style={{
+          backgroundColor: "var(--bg-card)",
+          boxShadow: "var(--border) 0 0 0 1px, 0 20px 40px -20px rgba(0,0,0,0.15)",
+        }}
+      >
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            role="menuitem"
+            tabIndex={open ? 0 : -1}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--card-bg-hover)]"
+            style={{ color: "var(--text-primary)" }}
+          >
+            <item.icon className="size-4 shrink-0" style={{ color: "var(--text-muted)" }} />
+            {item.label}
+          </button>
+        ))}
+      </div>
+    </li>
   );
 }
 
@@ -87,42 +163,8 @@ export function Navbar() {
             />
           </Link>
           <ul className="hidden items-center gap-6 md:flex">
-            <li>
-              <Dropdown>
-                <Dropdown.Trigger className="flex items-center gap-1 text-sm font-medium cursor-pointer" style={{ color: "var(--text-secondary)" }}>
-                  Producto
-                  <ChevronDown />
-                </Dropdown.Trigger>
-                <Dropdown.Popover>
-                  <Dropdown.Menu onAction={(key) => console.log(key)}>
-                    {PRODUCT_ITEMS.map((item) => (
-                      <Dropdown.Item key={item.id} id={item.id} textValue={item.label}>
-                        <item.icon className="size-4 shrink-0" style={{ color: "var(--text-muted)" }} />
-                        <Label>{item.label}</Label>
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Dropdown.Popover>
-              </Dropdown>
-            </li>
-            <li>
-              <Dropdown>
-                <Dropdown.Trigger className="flex items-center gap-1 text-sm font-medium cursor-pointer" style={{ color: "var(--text-secondary)" }}>
-                  Aprende
-                  <ChevronDown />
-                </Dropdown.Trigger>
-                <Dropdown.Popover>
-                  <Dropdown.Menu onAction={(key) => console.log(key)}>
-                    {LEARN_ITEMS.map((item) => (
-                      <Dropdown.Item key={item.id} id={item.id} textValue={item.label}>
-                        <item.icon className="size-4 shrink-0" style={{ color: "var(--text-muted)" }} />
-                        <Label>{item.label}</Label>
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Dropdown.Popover>
-              </Dropdown>
-            </li>
+            <HoverDropdown label="Producto" items={PRODUCT_ITEMS} />
+            <HoverDropdown label="Aprende" items={LEARN_ITEMS} />
             <li>
               <Link href="/noticias" className="flex items-center gap-1 text-sm font-medium cursor-pointer no-underline" style={{ color: "var(--text-secondary)" }}>
                 Noticias
