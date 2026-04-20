@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Dropdown, Label, Link } from "@heroui/react";
+import Link from "next/link";
+import { Dropdown, Label } from "@heroui/react";
 import { ChartColumn, CreditCard, Layers, Calculator, TargetDart, CircleQuestion, CircleInfo } from "@gravity-ui/icons";
 import { ThemeToggle } from "@/views/shared/ThemeToggle";
 
@@ -123,6 +124,11 @@ export function Navbar() {
               </Dropdown>
             </li>
             <li>
+              <Link href="/noticias" className="flex items-center gap-1 text-sm font-medium cursor-pointer no-underline" style={{ color: "var(--text-secondary)" }}>
+                Noticias
+              </Link>
+            </li>
+            <li>
               <button className="flex items-center gap-1 text-sm font-medium cursor-pointer" style={{ color: "var(--text-secondary)" }}>
                 Nosotros
               </button>
@@ -132,12 +138,12 @@ export function Navbar() {
 
         <div className="hidden items-center gap-3 md:flex">
           <ThemeToggle />
-          <button className="btn-pill btn-secondary cursor-pointer text-sm" style={{ padding: "8px 16px" }}>
+          <Link href="/login" className="btn-pill btn-secondary cursor-pointer text-sm no-underline" style={{ padding: "8px 16px" }}>
             Ingresar
-          </button>
-          <button className="btn-pill btn-primary cursor-pointer text-sm" style={{ padding: "8px 20px" }}>
+          </Link>
+          <Link href="/signup" className="btn-pill btn-primary cursor-pointer text-sm no-underline" style={{ padding: "8px 20px" }}>
             Crear cuenta
-          </button>
+          </Link>
         </div>
 
         <div className="flex items-center gap-3 md:hidden">
@@ -234,17 +240,26 @@ export function Navbar() {
             </div>
           </div>
 
+          <Link
+            href="/noticias"
+            className="py-2 text-left text-sm font-medium no-underline"
+            style={{ color: "var(--text-secondary)" }}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Noticias
+          </Link>
+
           <button className="py-2 text-left text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
             Nosotros
           </button>
 
           <div className="flex flex-col gap-3 pt-4" style={{ borderTop: "1px solid var(--border)" }}>
-            <button className="btn-pill btn-secondary w-full cursor-pointer text-sm" style={{ padding: "12px 16px" }}>
+            <Link href="/login" className="btn-pill btn-secondary w-full cursor-pointer text-sm text-center no-underline" style={{ padding: "12px 16px" }}>
               Ingresar
-            </button>
-            <button className="btn-pill btn-primary w-full cursor-pointer text-sm" style={{ padding: "12px 20px" }}>
+            </Link>
+            <Link href="/signup" className="btn-pill btn-primary w-full cursor-pointer text-sm text-center no-underline" style={{ padding: "12px 20px" }}>
               Crear cuenta
-            </button>
+            </Link>
           </div>
         </div>
     </div>
