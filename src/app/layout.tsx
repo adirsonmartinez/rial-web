@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Sora } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/views/navbar/Navbar";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -30,9 +29,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Google+Sans+Text:wght@400;500&display=swap"
         />
       </head>
-      <body className="min-h-full flex flex-col font-[family-name:var(--font-body)]">
-        <Navbar />
-        <main className="flex-1">{children}</main>
+      <body className="min-h-full font-[family-name:var(--font-body)]">
+        {children}
       </body>
     </html>
   );
