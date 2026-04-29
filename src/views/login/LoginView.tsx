@@ -45,15 +45,25 @@ export function LoginView() {
 
   return (
     <div
-      className="flex min-h-screen flex-col"
+      className="relative flex min-h-screen flex-col"
       style={{
-        backgroundColor: "#f5f6f5",
+        backgroundColor: "#fbfff5",
         ["--field-background" as string]: "#f5f6f5",
         ["--field-border" as string]: "var(--border)",
       }}
     >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/bg-login.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
       <header
-        className="w-full"
+        className="relative z-10 w-full"
         style={{ borderBottom: "1px solid #d4d7dc" }}
       >
         <div className="mx-auto flex h-20 w-full max-w-[1200px] items-center px-6">
@@ -79,7 +89,7 @@ export function LoginView() {
       </header>
 
       <div
-        className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col"
+        className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col"
         style={{ borderLeft: "1px solid #d4d7dc", borderRight: "1px solid #d4d7dc" }}
       >
         <div className="flex flex-1 items-center justify-center px-6 py-10">
