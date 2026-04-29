@@ -70,7 +70,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 
 export function FaqSection() {
   return (
-    <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-secondary)" }}>
+    <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div className="mx-auto max-w-3xl px-6">
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-4 mb-12">

@@ -1,5 +1,7 @@
 "use client";
 
+import { AppStoreBadge, GooglePlayBadge } from "./StoreBadges";
+
 export function CtaSection() {
   return (
     <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
@@ -13,10 +15,10 @@ export function CtaSection() {
             <p className="max-w-sm text-sm lg:text-base" style={{ lineHeight: 1.6, color: "var(--text-secondary)" }}>
               Si estás buscando una forma simple de organizar tu dinero en Venezuela, el primer paso es descargar Rial.
             </p>
-            <a href="#" className="btn-pill btn-primary inline-flex items-center gap-2 text-sm" style={{ padding: "10px 20px" }}>
-              Descargar Rial
-              <span>→</span>
-            </a>
+            <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
+              <AppStoreBadge />
+              <GooglePlayBadge />
+            </div>
           </div>
 
           {/* Right: image placeholder */}

@@ -1,17 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   Button,
+  Checkbox,
   FieldError,
   Form,
   Input,
   Label,
   TextField,
 } from "@heroui/react";
-import { Envelope, Lock, Eye, EyeSlash } from "@gravity-ui/icons";
 
 function GoogleIcon() {
   return (
@@ -37,8 +36,6 @@ function GoogleIcon() {
 }
 
 export function LoginView() {
-  const [showPassword, setShowPassword] = useState(false);
-
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.currentTarget));
@@ -47,47 +44,108 @@ export function LoginView() {
   };
 
   return (
-    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
-      {/* Form side */}
-      <div
-        className="relative flex flex-col px-6 py-8 lg:px-16 lg:py-12"
-        style={{
-          backgroundColor: "var(--bg-secondary)",
-          ["--field-background" as string]: "var(--bg-card)",
-          ["--field-border" as string]: "var(--border)",
-        }}
+    <div
+      className="flex min-h-screen flex-col"
+      style={{
+        backgroundColor: "#f5f6f5",
+        ["--field-background" as string]: "#f5f6f5",
+        ["--field-border" as string]: "var(--border)",
+      }}
+    >
+      <header
+        className="w-full"
+        style={{ borderBottom: "1px solid #d4d7dc" }}
       >
-        <Link href="/" className="inline-flex items-center no-underline">
-          <Image
-            src="/logos/logo-dark.png"
-            alt="Rial"
-            width={90}
-            height={36}
-            className="block dark:hidden h-auto"
-            priority
-          />
-          <Image
-            src="/logos/logo-light.png"
-            alt="Rial"
-            width={90}
-            height={36}
-            className="hidden dark:block h-auto"
-            priority
-          />
-        </Link>
+        <div className="mx-auto flex h-20 w-full max-w-[1200px] items-center px-6">
+          <Link href="/" className="inline-flex items-center no-underline">
+            <Image
+              src="/logos/logo-dark.png"
+              alt="Rial"
+              width={90}
+              height={36}
+              className="block dark:hidden h-auto"
+              priority
+            />
+            <Image
+              src="/logos/logo-light.png"
+              alt="Rial"
+              width={90}
+              height={36}
+              className="hidden dark:block h-auto"
+              priority
+            />
+          </Link>
+        </div>
+      </header>
 
-        <div className="flex flex-1 items-center justify-center py-10">
-          <div className="w-full max-w-sm">
-            <div className="mb-8">
-              <h1 className="display-heading text-[clamp(1.75rem,3vw,2.25rem)]">
-                Bienvenido de nuevo
-              </h1>
-              <p
-                className="mt-2 text-sm"
-                style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
-              >
-                Ingresa a tu cuenta de Rial
-              </p>
+      <div
+        className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col"
+        style={{ borderLeft: "1px solid #d4d7dc", borderRight: "1px solid #d4d7dc" }}
+      >
+        <div className="flex flex-1 items-center justify-center px-6 py-10">
+        <div
+          className="w-full max-w-[540px] rounded-2xl px-16 py-8"
+          style={{
+            backgroundColor: "#ffffff",
+            border: "1px solid #edeef0",
+            boxShadow: "0 1px 2px rgba(22, 22, 22, 0.04), 0 8px 24px rgba(22, 22, 22, 0.06)",
+          }}
+        >
+          <div className="mb-8 text-center">
+            <h1 className="display-heading text-[clamp(1.75rem,3vw,2.25rem)]">
+              Bienvenido de nuevo
+            </h1>
+            <p
+              className="mt-2 text-sm"
+              style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
+            >
+              Ingresa a tu cuenta de Rial
+            </p>
+          </div>
+
+          <Form onSubmit={onSubmit} className="flex flex-col gap-4">
+            <TextField name="email" type="email" isRequired fullWidth>
+              <Label>Email</Label>
+              <Input placeholder="tu@email.com" fullWidth />
+              <FieldError />
+            </TextField>
+
+            <TextField name="password" type="password" isRequired fullWidth>
+              <div className="flex items-center justify-between">
+                <Label>Contraseña</Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium no-underline hover:underline"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
+              <Input placeholder="••••••••" fullWidth />
+              <FieldError />
+            </TextField>
+
+            <Checkbox
+              name="remember"
+              className="flex items-center gap-2 text-sm"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+              <Checkbox.Content>Mantener sesión iniciada</Checkbox.Content>
+            </Checkbox>
+
+            <Button type="submit" variant="primary" fullWidth className="mt-2">
+              Ingresar
+            </Button>
+
+            <div className="my-2 flex items-center gap-4">
+              <div className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                o continúa con
+              </span>
+              <div className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
             </div>
 
             <Button
@@ -98,144 +156,29 @@ export function LoginView() {
               style={{ ["--button-fg" as string]: "var(--text-primary)" }}
             >
               <GoogleIcon />
-              Continuar con Google
+              Ingresar con Google
             </Button>
+          </Form>
 
-            <div className="my-6 flex items-center gap-4">
-              <div className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
-              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-                o continúa con email
-              </span>
-              <div className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
-            </div>
-
-            <Form onSubmit={onSubmit} className="flex flex-col gap-4">
-              <TextField name="email" type="email" isRequired fullWidth>
-                <Label>Email</Label>
-                <div className="relative w-full">
-                  <Envelope
-                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
-                    style={{ color: "var(--text-muted)" }}
-                  />
-                  <Input placeholder="tu@email.com" className="pl-10" fullWidth />
-                </div>
-                <FieldError />
-              </TextField>
-
-              <TextField
-                name="password"
-                type={showPassword ? "text" : "password"}
-                isRequired
-                fullWidth
-              >
-                <div className="flex items-center justify-between">
-                  <Label>Contraseña</Label>
-                  <Link
-                    href="/forgot-password"
-                    className="text-xs font-medium no-underline hover:underline"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </Link>
-                </div>
-                <div className="relative w-full">
-                  <Lock
-                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
-                    style={{ color: "var(--text-muted)" }}
-                  />
-                  <Input placeholder="••••••••" className="pl-10 pr-10" fullWidth />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-                    style={{ color: "var(--text-muted)" }}
-                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                  >
-                    {showPassword ? <EyeSlash className="size-4" /> : <Eye className="size-4" />}
-                  </button>
-                </div>
-                <FieldError />
-              </TextField>
-
-              <Button type="submit" variant="primary" fullWidth className="mt-2">
-                Ingresar
-              </Button>
-            </Form>
-
-            <p
-              className="mt-8 text-center text-sm"
-              style={{ color: "var(--text-secondary)" }}
+          <p
+            className="mt-8 text-center text-sm"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            ¿No tienes cuenta?{" "}
+            <Link
+              href="/signup"
+              className="font-medium no-underline hover:underline"
+              style={{ color: "var(--text-primary)" }}
             >
-              ¿No tienes cuenta?{" "}
-              <Link
-                href="/signup"
-                className="font-medium no-underline hover:underline"
-                style={{ color: "var(--text-primary)" }}
-              >
-                Crear cuenta
-              </Link>
-            </p>
-          </div>
+              Crear cuenta
+            </Link>
+          </p>
+        </div>
         </div>
 
-        <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+        <p className="px-6 pb-8 text-left text-sm" style={{ color: "var(--text-muted)" }}>
           © {new Date().getFullYear()} Rial · Hecho en Venezuela
         </p>
-      </div>
-
-      {/* Brand side */}
-      <div
-        className="relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-12"
-        style={{ backgroundColor: "var(--rial)" }}
-      >
-        <div
-          className="absolute -right-32 -top-32 h-[400px] w-[400px] rounded-full"
-          style={{ backgroundColor: "rgba(22, 22, 22, 0.08)" }}
-        />
-        <div
-          className="absolute -bottom-40 -left-20 h-[500px] w-[500px] rounded-full"
-          style={{ backgroundColor: "rgba(22, 22, 22, 0.06)" }}
-        />
-
-        <div className="relative">
-          <p
-            className="text-xs font-medium uppercase tracking-widest"
-            style={{ color: "rgba(22, 22, 22, 0.6)" }}
-          >
-            Finanzas personales para Venezuela
-          </p>
-        </div>
-
-        <div className="relative">
-          <h2
-            className="font-[family-name:var(--font-sora)] text-[clamp(2.5rem,4vw,4rem)] font-[800] leading-[0.95]"
-            style={{ color: "#161616" }}
-          >
-            Organiza, ahorra y gestiona tu dinero
-          </h2>
-          <p
-            className="mt-6 max-w-md text-base"
-            style={{ color: "rgba(22, 22, 22, 0.7)", lineHeight: 1.6 }}
-          >
-            Bolívares, dólares y euros en un solo lugar. Únete a más de 40 mil
-            venezolanos que ya confían en Rial.
-          </p>
-        </div>
-
-        <div className="relative flex items-center gap-3">
-          <div className="flex -space-x-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="h-8 w-8 rounded-full border-2 border-[#ACE524]"
-                style={{ backgroundImage: `url(https://i.pravatar.cc/40?img=${i})`, backgroundSize: "cover" }}
-              />
-            ))}
-          </div>
-          <p className="text-sm font-medium" style={{ color: "#161616" }}>
-            +40K usuarios activos
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -69,7 +69,7 @@ export function FeaturesSection() {
   const onMouseUp = () => setIsDragging(false);
 
   return (
-    <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-secondary)" }}>
+    <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-col gap-12 lg:flex-row lg:gap-10">
           {/* Left: heading + description */}
@@ -88,11 +88,6 @@ export function FeaturesSection() {
             <p className="text-base lg:text-lg" style={{ lineHeight: 1.6, color: "var(--text-secondary)" }}>
               Todo lo que necesitas para organizar, ahorrar y hacer crecer tu dinero — en una sola app.
             </p>
-
-            <a href="#" className="btn-pill btn-primary inline-flex items-center gap-2 self-start text-sm" style={{ padding: "10px 20px" }}>
-              Ver todo
-              <span>→</span>
-            </a>
           </div>
 
           {/* Right: horizontal scroll cards */}

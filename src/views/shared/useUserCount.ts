@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 // const supabase = createClient(...)
 // supabase.channel('user-count').on('broadcast', { event: 'count' }, (payload) => { ... })
 
-const CURRENT_COUNT = 42_947;
+const CURRENT_COUNT = 50_124;
 
 export function useUserCount() {
   const [count, setCount] = useState(CURRENT_COUNT);

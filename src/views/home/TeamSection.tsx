@@ -19,7 +19,7 @@ function LinkedInIcon() {
 
 export function TeamSection() {
   return (
-    <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-secondary)" }}>
+    <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-4 mb-16">
