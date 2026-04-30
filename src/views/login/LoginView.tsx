@@ -11,6 +11,7 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
+import { useLoginViewModel } from "./useLoginViewModel";
 
 function GoogleIcon() {
   return (
@@ -36,11 +37,15 @@ function GoogleIcon() {
 }
 
 export function LoginView() {
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const { isSubmitting, errorMessage, signInWithEmail, signInWithGoogle } =
+    useLoginViewModel();
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget));
-    // TODO: connect to Supabase auth
-    console.log("login", data);
+    const data = new FormData(e.currentTarget);
+    const email = String(data.get("email") ?? "");
+    const password = String(data.get("password") ?? "");
+    await signInWithEmail(email, password);
   };
 
   return (
@@ -146,8 +151,24 @@ export function LoginView() {
               <Checkbox.Content>Mantener sesión iniciada</Checkbox.Content>
             </Checkbox>
 
-            <Button type="submit" variant="primary" fullWidth className="mt-2">
-              Ingresar
+            {errorMessage && (
+              <p
+                className="text-sm"
+                style={{ color: "#dc2626" }}
+                role="alert"
+              >
+                {errorMessage}
+              </p>
+            )}
+
+            <Button
+              type="submit"
+              variant="primary"
+              fullWidth
+              className="mt-2"
+              isDisabled={isSubmitting}
+            >
+              {isSubmitting ? "Ingresando…" : "Ingresar"}
             </Button>
 
             <div className="my-2 flex items-center gap-4">
@@ -164,6 +185,7 @@ export function LoginView() {
               fullWidth
               className="gap-2"
               style={{ ["--button-fg" as string]: "var(--text-primary)" }}
+              onPress={signInWithGoogle}
             >
               <GoogleIcon />
               Ingresar con Google

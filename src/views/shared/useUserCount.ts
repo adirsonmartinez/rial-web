@@ -1,17 +1,34 @@
-import { useState, useEffect } from "react";
+"use client";
 
-// TODO: Connect to Supabase realtime
-// const supabase = createClient(...)
-// supabase.channel('user-count').on('broadcast', { event: 'count' }, (payload) => { ... })
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-const CURRENT_COUNT = 50_124;
+const FALLBACK_COUNT = 50_124;
 
 export function useUserCount() {
-  const [count, setCount] = useState(CURRENT_COUNT);
+  const [count, setCount] = useState(FALLBACK_COUNT);
 
   useEffect(() => {
-    // Placeholder: replace with Supabase realtime subscription
-    setCount(CURRENT_COUNT);
+    const supabase = createClient();
+    let cancelled = false;
+
+    supabase.rpc("get_user_count").then(({ data, error }) => {
+      if (cancelled || error) return;
+      if (typeof data === "number") setCount(data);
+    });
+
+    const channel = supabase
+      .channel("user-count")
+      .on("broadcast", { event: "count_changed" }, (msg) => {
+        const next = (msg.payload as { count?: number } | null)?.count;
+        if (typeof next === "number") setCount(next);
+      })
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return count;
