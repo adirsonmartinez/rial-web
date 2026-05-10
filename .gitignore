@@ -42,3 +42,7 @@ next-env.d.ts
 
 # local claude config
 .claude/
+
+# skills (regenerable via `npx skills add`)
+.agents/
+skills-lock.json

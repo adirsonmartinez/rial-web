@@ -39,7 +39,7 @@ export function Navbar() {
     <>
     <header
       className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled ? "backdrop-blur-md" : "bg-transparent"}`}
-      style={scrolled ? { backgroundColor: "var(--navbar-bg)", borderBottom: "1px solid #d4d7dc" } : { borderBottom: "1px solid #d4d7dc" }}
+      style={scrolled ? { backgroundColor: "var(--navbar-bg)", borderBottom: "1px solid var(--border)" } : { borderBottom: "1px solid var(--border)" }}
     >
       <nav className="mx-auto flex h-20 w-full max-w-[1200px] items-center justify-between px-6">
         <div className="flex items-center gap-10">

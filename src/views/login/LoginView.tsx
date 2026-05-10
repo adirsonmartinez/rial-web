@@ -11,6 +11,7 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
+import { ThemeToggle } from "@/views/shared/ThemeToggle";
 import { useLoginViewModel } from "./useLoginViewModel";
 
 function GoogleIcon() {
@@ -52,14 +53,14 @@ export function LoginView() {
     <div
       className="relative flex min-h-screen flex-col"
       style={{
-        backgroundColor: "#fbfff5",
-        ["--field-background" as string]: "#f5f6f5",
+        backgroundColor: "var(--bg-primary)",
+        ["--field-background" as string]: "var(--bg-secondary)",
         ["--field-border" as string]: "var(--border)",
       }}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
+        className="pointer-events-none absolute inset-0 z-0 opacity-100 dark:opacity-30"
         style={{
           backgroundImage: "url('/bg-login.png')",
           backgroundSize: "cover",
@@ -69,9 +70,9 @@ export function LoginView() {
       />
       <header
         className="relative z-10 w-full"
-        style={{ borderBottom: "1px solid #d4d7dc" }}
+        style={{ borderBottom: "1px solid var(--border)" }}
       >
-        <div className="mx-auto flex h-20 w-full max-w-[1200px] items-center px-6">
+        <div className="mx-auto flex h-20 w-full max-w-[1200px] items-center justify-between px-6">
           <Link href="/" className="inline-flex items-center no-underline">
             <Image
               src="/logos/logo-dark.png"
@@ -90,20 +91,21 @@ export function LoginView() {
               priority
             />
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 
       <div
         className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col"
-        style={{ borderLeft: "1px solid #d4d7dc", borderRight: "1px solid #d4d7dc" }}
+        style={{ borderLeft: "1px solid var(--border)", borderRight: "1px solid var(--border)" }}
       >
         <div className="flex flex-1 items-center justify-center px-6 py-10">
         <div
           className="w-full max-w-[540px] rounded-2xl px-16 py-8"
           style={{
-            backgroundColor: "#ffffff",
-            border: "1px solid #edeef0",
-            boxShadow: "0 1px 2px rgba(22, 22, 22, 0.04), 0 8px 24px rgba(22, 22, 22, 0.06)",
+            backgroundColor: "var(--bg-card)",
+            border: "1px solid var(--border)",
+            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.08)",
           }}
         >
           <div className="mb-8 text-center">
