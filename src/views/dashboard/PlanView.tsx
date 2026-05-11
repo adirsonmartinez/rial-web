@@ -1,0 +1,329 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Button, Chip, Tabs } from "@heroui/react";
+import {
+  ArrowLeft,
+  Check,
+  Sparkles,
+  CrownDiamond,
+} from "@gravity-ui/icons";
+
+type Cadence = "mensual" | "trimestral" | "semestral" | "anual";
+
+type CadenceInfo = {
+  id: Cadence;
+  tabLabel: string;
+  monthlyEquivalent: string;
+  totalPrice: string;
+  helper: string;
+  discountPct?: number;
+};
+
+const cadences: CadenceInfo[] = [
+  {
+    id: "mensual",
+    tabLabel: "Mensual",
+    monthlyEquivalent: "$4,99",
+    totalPrice: "$4,99",
+    helper: "USD / mes · facturado mensualmente",
+  },
+  {
+    id: "trimestral",
+    tabLabel: "Trimestral",
+    monthlyEquivalent: "$4,50",
+    totalPrice: "$13,49",
+    helper: "USD / mes · facturado trimestralmente ($13,49)",
+    discountPct: 10,
+  },
+  {
+    id: "semestral",
+    tabLabel: "Semestral",
+    monthlyEquivalent: "$4,00",
+    totalPrice: "$23,99",
+    helper: "USD / mes · facturado semestralmente ($23,99)",
+    discountPct: 20,
+  },
+  {
+    id: "anual",
+    tabLabel: "Anual",
+    monthlyEquivalent: "$3,50",
+    totalPrice: "$41,99",
+    helper: "USD / mes · facturado anualmente ($41,99)",
+    discountPct: 30,
+  },
+];
+
+const freePlan = {
+  id: "free" as const,
+  name: "Plan Free",
+  tagline: "Para empezar a organizar tus finanzas.",
+  icon: Sparkles,
+  ctaLabel: "Plan actual",
+  isCurrent: true,
+  isHighlighted: false,
+  features: [
+    "Hasta 5 cuentas (3 nacionales + 2 internacionales). Efectivo USD y VES no cuentan",
+    "30 transacciones al mes",
+    "Categorías ilimitadas + creación y categorización con IA",
+    "Hasta 5 pagos recurrentes manuales de registro rápido",
+    "Hasta 5 pagos recurrentes programados",
+    "5 registros por voz al mes + 1 dictado masivo",
+    "Calculadora de tasas completa",
+    "Tasas del día: BCV dólar, BCV euro, USD/EUR, USDT",
+    "Historial de 1 mes de movimientos",
+    "Presupuestos ilimitados",
+    "Metas de ahorro ilimitadas",
+    "3 listas mensuales (20 ítems c/u)",
+  ],
+};
+
+const plusPlan = {
+  id: "plus" as const,
+  name: "Plan Plus",
+  tagline: "Finanzas sin límites.",
+  icon: CrownDiamond,
+  ctaLabel: "Elegir Plus",
+  isCurrent: false,
+  isHighlighted: true,
+  featuresIntro: "Todo lo de Free, además:",
+  features: [
+    "Cuentas ilimitadas",
+    "Transacciones ilimitadas",
+    "Pagos recurrentes ilimitados",
+    "Registro por voz sin límite + dictado masivo ilimitado",
+    "Historial de movimientos completo",
+    "Lista de compras completa e ilimitada",
+  ],
+};
+
+function FreePlanCard() {
+  const Icon = freePlan.icon;
+  return (
+    <article
+      className="relative flex h-full flex-col gap-6 rounded-[30px] p-8"
+      style={{
+        backgroundColor: "var(--bg-card)",
+        border: "1px solid var(--border)",
+      }}
+    >
+      <header className="flex flex-col gap-4">
+        <span
+          className="flex h-10 w-10 items-center justify-center rounded-full"
+          style={{
+            backgroundColor: "var(--accent-soft-bg)",
+            color: "var(--accent-soft-icon)",
+          }}
+        >
+          <Icon width={20} height={20} />
+        </span>
+        <div>
+          <h2
+            className="display-heading text-2xl"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {freePlan.name}
+          </h2>
+          <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
+            {freePlan.tagline}
+          </p>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span
+            className="display-heading text-4xl"
+            style={{ color: "var(--text-primary)" }}
+          >
+            $0
+          </span>
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+            para siempre
+          </span>
+        </div>
+      </header>
+
+      <div
+        className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
+        style={{
+          backgroundColor: "var(--accent-soft-bg)",
+          color: "var(--accent-soft-icon)",
+        }}
+      >
+        <Check width={16} height={16} />
+        <span>{freePlan.ctaLabel}</span>
+      </div>
+
+      <div
+        className="h-px w-full"
+        style={{ backgroundColor: "var(--border)" }}
+      />
+
+      <ul className="flex flex-col gap-3">
+        {freePlan.features.map((feature) => (
+          <FeatureRow key={feature} text={feature} />
+        ))}
+      </ul>
+    </article>
+  );
+}
+
+function PlusPlanCard({ cadence }: { cadence: CadenceInfo }) {
+  const Icon = plusPlan.icon;
+  return (
+    <article
+      className="relative flex h-full flex-col gap-6 rounded-[30px] p-8"
+      style={{
+        backgroundColor: "var(--bg-card)",
+        border: "2px solid var(--accent)",
+      }}
+    >
+      <span
+        className="absolute -top-3 right-8 rounded-full px-3 py-1 text-xs font-semibold"
+        style={{
+          backgroundColor: "var(--accent)",
+          color: "var(--accent-foreground)",
+        }}
+      >
+        Popular
+      </span>
+
+      <header className="flex flex-col gap-4">
+        <span
+          className="flex h-10 w-10 items-center justify-center rounded-full"
+          style={{
+            backgroundColor: "var(--accent-soft-bg)",
+            color: "var(--accent-soft-icon)",
+          }}
+        >
+          <Icon width={20} height={20} />
+        </span>
+        <div>
+          <h2
+            className="display-heading text-2xl"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {plusPlan.name}
+          </h2>
+          <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
+            {plusPlan.tagline}
+          </p>
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span
+              className="display-heading text-4xl"
+              style={{ color: "var(--text-primary)" }}
+            >
+              {cadence.monthlyEquivalent}
+            </span>
+            {cadence.discountPct && (
+              <Chip color="success" variant="soft" size="sm">
+                Ahorra {cadence.discountPct}%
+              </Chip>
+            )}
+          </div>
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+            {cadence.helper}
+          </span>
+        </div>
+      </header>
+
+      <Button variant="primary" fullWidth className="h-11">
+        {plusPlan.ctaLabel}
+      </Button>
+
+      <div
+        className="h-px w-full"
+        style={{ backgroundColor: "var(--border)" }}
+      />
+
+      <ul className="flex flex-col gap-3">
+        <li
+          className="text-sm font-semibold"
+          style={{ color: "var(--text-primary)" }}
+        >
+          {plusPlan.featuresIntro}
+        </li>
+        {plusPlan.features.map((feature) => (
+          <FeatureRow key={feature} text={feature} />
+        ))}
+      </ul>
+    </article>
+  );
+}
+
+function FeatureRow({ text }: { text: string }) {
+  return (
+    <li className="flex items-start gap-2">
+      <span
+        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+        style={{
+          backgroundColor: "var(--accent-soft-bg)",
+          color: "var(--accent-soft-icon)",
+        }}
+      >
+        <Check width={12} height={12} />
+      </span>
+      <span className="text-sm" style={{ color: "var(--text-primary)" }}>
+        {text}
+      </span>
+    </li>
+  );
+}
+
+export function PlanView() {
+  const [cadenceId, setCadenceId] = useState<Cadence>("trimestral");
+  const cadence =
+    cadences.find((c) => c.id === cadenceId) ?? cadences[1];
+
+  return (
+    <div className="mx-auto w-full max-w-[1100px] px-6 py-8">
+      <Link
+        href="/app"
+        aria-label="Volver al dashboard"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full no-underline transition-colors hover:bg-[var(--card-bg-hover)]"
+        style={{ color: "var(--text-primary)" }}
+      >
+        <ArrowLeft width={20} height={20} />
+      </Link>
+
+      <header className="mt-6 flex flex-col items-center gap-6 text-center">
+        <h1
+          className="display-heading text-[clamp(2rem,4vw,2.75rem)]"
+          style={{ color: "var(--text-primary)" }}
+        >
+          Planes que crecen contigo
+        </h1>
+
+        <Tabs
+          selectedKey={cadenceId}
+          onSelectionChange={(key) => setCadenceId(String(key) as Cadence)}
+        >
+          <Tabs.ListContainer>
+            <Tabs.List aria-label="Cadencia de facturación">
+              {cadences.map((c) => (
+                <Tabs.Tab key={c.id} id={c.id}>
+                  {c.tabLabel}
+                  <Tabs.Indicator />
+                </Tabs.Tab>
+              ))}
+            </Tabs.List>
+          </Tabs.ListContainer>
+        </Tabs>
+      </header>
+
+      <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
+        <FreePlanCard />
+        <PlusPlanCard cadence={cadence} />
+      </div>
+
+      <p
+        className="mx-auto mt-10 max-w-3xl text-center text-xs"
+        style={{ color: "var(--text-muted)" }}
+      >
+        Precios en USD. Aplica IVA 16%. Los precios y los planes están sujetos
+        a cambios sin previo aviso.
+      </p>
+    </div>
+  );
+}

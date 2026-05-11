@@ -3,8 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Avatar, Button, Chip, Modal } from "@heroui/react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Avatar,
+  Button,
+  Chip,
+  Dropdown,
+  Header,
+  Label,
+  Modal,
+  Separator,
+} from "@heroui/react";
 import {
   House,
   CreditCard,
@@ -13,10 +22,14 @@ import {
   Target,
   ArrowRightArrowLeft,
   ArrowsRotateRight,
-  CircleQuestion,
-  ArrowRightFromSquare,
   Sparkles,
+  Gear,
+  Globe,
+  CircleQuestion,
+  CircleArrowUp,
+  ArrowRightFromSquare,
 } from "@gravity-ui/icons";
+import { SettingsModal, type SettingsSectionId } from "./SettingsModal";
 
 type NavItem = {
   href: string;
@@ -76,9 +89,20 @@ function NavRow({
   );
 }
 
+const USER_EMAIL = "usuario@rial.app";
+
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [comingSoonLabel, setComingSoonLabel] = useState<string | null>(null);
+  const [settings, setSettings] = useState<{
+    open: boolean;
+    section: SettingsSectionId;
+  }>({ open: false, section: "perfil" });
+
+  const openSettings = (section: SettingsSectionId) => {
+    setSettings({ open: true, section });
+  };
 
   return (
     <aside
@@ -129,55 +153,87 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto flex flex-col gap-1">
-        <Link
-          href="/app/ayuda"
-          className="flex h-11 w-full items-center gap-3 rounded-full px-4 text-sm font-medium no-underline transition-colors hover:bg-[var(--card-bg-hover)]"
-          style={{ color: "var(--text-primary)" }}
+      <Dropdown>
+        <Dropdown.Trigger
+          aria-label="Menú de usuario"
+          className="mt-auto flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2 text-left transition-colors hover:bg-[var(--card-bg-hover)]"
         >
-          <CircleQuestion width={20} height={20} />
-          <span>Ayuda e información</span>
-        </Link>
-        <Link
-          href="/logout"
-          className="flex h-11 w-full items-center gap-3 rounded-full px-4 text-sm font-medium no-underline transition-colors hover:bg-[var(--card-bg-hover)]"
-          style={{ color: "var(--text-primary)" }}
-        >
-          <ArrowRightFromSquare width={20} height={20} />
-          <span>Cerrar sesión</span>
-        </Link>
-      </div>
-
-      <div
-        className="mt-3 flex items-center gap-3 px-2 pt-4"
-        style={{ borderTop: "1px solid var(--border)" }}
-      >
-        <Avatar size="md">
-          <Avatar.Fallback>
-            <span
-              className="flex h-full w-full items-center justify-center rounded-full"
-              style={{
-                background:
-                  "linear-gradient(135deg, #c4b5fd 0%, #93c5fd 50%, #a5b4fc 100%)",
-              }}
-            />
-          </Avatar.Fallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <p
-            className="truncate text-sm font-semibold"
-            style={{ color: "var(--text-primary)" }}
+          <Avatar size="md">
+            <Avatar.Fallback>
+              <span
+                className="flex h-full w-full items-center justify-center rounded-full"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #c4b5fd 0%, #93c5fd 50%, #a5b4fc 100%)",
+                }}
+              />
+            </Avatar.Fallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <p
+              className="truncate text-sm font-semibold"
+              style={{ color: "var(--text-primary)" }}
+            >
+              Usuario
+            </p>
+            <p
+              className="truncate text-xs"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {USER_EMAIL}
+            </p>
+          </div>
+        </Dropdown.Trigger>
+        <Dropdown.Popover className="min-w-[260px]" placement="top start">
+          <Dropdown.Menu
+            onAction={(key) => {
+              switch (key) {
+                case "ajustes":
+                  openSettings("perfil");
+                  break;
+                case "mejorar":
+                  router.push("/app/plan");
+                  break;
+                case "idioma":
+                case "ayuda":
+                  setComingSoonLabel(
+                    key === "idioma" ? "Idioma" : "Obtener ayuda"
+                  );
+                  break;
+                case "logout":
+                  // TODO: wire up to supabase signOut
+                  break;
+              }
+            }}
           >
-            Usuario
-          </p>
-          <p
-            className="truncate text-xs"
-            style={{ color: "var(--text-muted)" }}
-          >
-            usuario@rial.app
-          </p>
-        </div>
-      </div>
+            <Dropdown.Section>
+              <Header>{USER_EMAIL}</Header>
+              <Dropdown.Item id="ajustes" textValue="Ajustes">
+                <Gear />
+                <Label>Ajustes</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="idioma" textValue="Idioma">
+                <Globe />
+                <Label>Idioma</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="ayuda" textValue="Obtener ayuda">
+                <CircleQuestion />
+                <Label>Obtener ayuda</Label>
+              </Dropdown.Item>
+            </Dropdown.Section>
+            <Separator />
+            <Dropdown.Item id="mejorar" textValue="Mejorar plan">
+              <CircleArrowUp />
+              <Label>Mejorar plan</Label>
+            </Dropdown.Item>
+            <Separator />
+            <Dropdown.Item id="logout" textValue="Cerrar sesión">
+              <ArrowRightFromSquare />
+              <Label>Cerrar sesión</Label>
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown.Popover>
+      </Dropdown>
 
       <Modal.Backdrop
         isOpen={comingSoonLabel !== null}
@@ -212,6 +268,14 @@ export function Sidebar() {
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>
+
+      <SettingsModal
+        isOpen={settings.open}
+        onOpenChange={(open) =>
+          setSettings((prev) => ({ ...prev, open }))
+        }
+        initialSection={settings.section}
+      />
     </aside>
   );
 }
