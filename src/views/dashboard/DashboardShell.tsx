@@ -4,9 +4,17 @@ import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
-const USER_PLACEHOLDER = "Usuario";
+type DashboardShellProps = {
+  children: React.ReactNode;
+  userEmail: string;
+  userName: string;
+};
 
-export function DashboardShell({ children }: { children: React.ReactNode }) {
+export function DashboardShell({
+  children,
+  userEmail,
+  userName,
+}: DashboardShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
@@ -18,12 +26,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         className={`${isSidebarOpen ? "w-[280px]" : "w-0"} shrink-0 overflow-hidden transition-[width] duration-300 ease-out`}
       >
         <div className="w-[280px]">
-          <Sidebar />
+          <Sidebar userEmail={userEmail} userName={userName} />
         </div>
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
-          userName={USER_PLACEHOLDER}
+          userName={userName}
           onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
         />
         <main className="flex-1">{children}</main>

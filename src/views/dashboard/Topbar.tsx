@@ -40,7 +40,7 @@ export function Topbar({ userName, onToggleSidebar }: TopbarProps) {
         className="text-base font-semibold"
         style={{ color: "var(--text-primary)" }}
       >
-        {greeting}, {userName}
+        {greeting}, {userName.trim().split(/\s+/)[0]}
       </h1>
       <div className="ml-auto">
         <ThemeSwitcher />

@@ -29,6 +29,7 @@ import {
   CircleArrowUp,
   ArrowRightFromSquare,
 } from "@gravity-ui/icons";
+import { createClient } from "@/lib/supabase/client";
 import { SettingsModal, type SettingsSectionId } from "./SettingsModal";
 
 type NavItem = {
@@ -89,9 +90,12 @@ function NavRow({
   );
 }
 
-const USER_EMAIL = "usuario@rial.app";
+type SidebarProps = {
+  userEmail: string;
+  userName: string;
+};
 
-export function Sidebar() {
+export function Sidebar({ userEmail, userName }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [comingSoonLabel, setComingSoonLabel] = useState<string | null>(null);
@@ -103,6 +107,15 @@ export function Sidebar() {
   const openSettings = (section: SettingsSectionId) => {
     setSettings({ open: true, section });
   };
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace("/login");
+    router.refresh();
+  };
+
+  const initial = (userName || userEmail || "?").trim().charAt(0).toUpperCase();
 
   return (
     <aside
@@ -161,12 +174,14 @@ export function Sidebar() {
           <Avatar size="md">
             <Avatar.Fallback>
               <span
-                className="flex h-full w-full items-center justify-center rounded-full"
+                className="flex h-full w-full items-center justify-center rounded-full text-sm font-semibold"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #c4b5fd 0%, #93c5fd 50%, #a5b4fc 100%)",
+                  backgroundColor: "var(--accent-soft-bg)",
+                  color: "var(--accent-soft-icon)",
                 }}
-              />
+              >
+                {initial}
+              </span>
             </Avatar.Fallback>
           </Avatar>
           <div className="min-w-0 flex-1">
@@ -174,13 +189,13 @@ export function Sidebar() {
               className="truncate text-sm font-semibold"
               style={{ color: "var(--text-primary)" }}
             >
-              Usuario
+              {userName}
             </p>
             <p
               className="truncate text-xs"
               style={{ color: "var(--text-muted)" }}
             >
-              {USER_EMAIL}
+              {userEmail}
             </p>
           </div>
         </Dropdown.Trigger>
@@ -201,13 +216,13 @@ export function Sidebar() {
                   );
                   break;
                 case "logout":
-                  // TODO: wire up to supabase signOut
+                  void handleLogout();
                   break;
               }
             }}
           >
             <Dropdown.Section>
-              <Header>{USER_EMAIL}</Header>
+              <Header>{userEmail}</Header>
               <Dropdown.Item id="ajustes" textValue="Ajustes">
                 <Gear />
                 <Label>Ajustes</Label>

@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export function useLoginViewModel() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const nextPath = sanitizeNext(searchParams.get("next"));
 
   const signInWithEmail = async (email: string, password: string) => {
     setIsSubmitting(true);
@@ -22,17 +25,19 @@ export function useLoginViewModel() {
       return;
     }
 
-    router.push("/");
+    router.replace(nextPath);
     router.refresh();
   };
 
   const signInWithGoogle = async () => {
     setErrorMessage(null);
     const supabase = createClient();
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    callbackUrl.searchParams.set("next", nextPath);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl.toString(),
       },
     });
 
@@ -47,6 +52,11 @@ export function useLoginViewModel() {
     signInWithEmail,
     signInWithGoogle,
   };
+}
+
+function sanitizeNext(raw: string | null): string {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/app";
+  return raw;
 }
 
 function translateAuthError(message: string): string {
