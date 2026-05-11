@@ -6,9 +6,12 @@ import type {
   VenflowWebhookEvent,
 } from "./types";
 
-type BillingCycle = "monthly" | "quarterly" | "biannual" | "annual";
+// Venflow uses: monthly | quarterly | biannual | annual
+// Supabase uses: monthly | quarterly | semiannual | yearly | lifetime
+type VenflowCycle = "monthly" | "quarterly" | "biannual" | "annual";
+type DbCycle = "monthly" | "quarterly" | "semiannual" | "yearly";
 
-function isBillingCycle(value: unknown): value is BillingCycle {
+function isVenflowCycle(value: unknown): value is VenflowCycle {
   return (
     value === "monthly" ||
     value === "quarterly" ||
@@ -17,9 +20,21 @@ function isBillingCycle(value: unknown): value is BillingCycle {
   );
 }
 
-function computePeriodEnd(start: Date, billingCycle: BillingCycle): Date {
+function toDbCycle(cycle: VenflowCycle): DbCycle {
+  switch (cycle) {
+    case "biannual":
+      return "semiannual";
+    case "annual":
+      return "yearly";
+    case "monthly":
+    case "quarterly":
+      return cycle;
+  }
+}
+
+function computePeriodEnd(start: Date, cycle: VenflowCycle): Date {
   const end = new Date(start);
-  switch (billingCycle) {
+  switch (cycle) {
     case "quarterly":
       end.setMonth(end.getMonth() + 3);
       break;
@@ -92,12 +107,13 @@ export async function handlePaymentSuccess(
   }
 
   const metaCycle = event.session?.metadata?.billing_cycle;
-  const billingCycle: BillingCycle = isBillingCycle(metaCycle)
+  const venflowCycle: VenflowCycle = isVenflowCycle(metaCycle)
     ? metaCycle
     : "monthly";
+  const dbCycle = toDbCycle(venflowCycle);
 
   const now = new Date();
-  const periodEnd = computePeriodEnd(now, billingCycle);
+  const periodEnd = computePeriodEnd(now, venflowCycle);
 
   const { data: upsertedSub, error: subErr } = await supabase
     .from("subscriptions")
@@ -106,7 +122,7 @@ export async function handlePaymentSuccess(
         user_id: userId,
         plan_id: plusPlanId,
         status: "active",
-        billing_cycle: billingCycle,
+        billing_cycle: dbCycle,
         provider: "venflow",
         provider_customer_id: event.client.id,
         current_period_start: now.toISOString(),
@@ -137,7 +153,7 @@ export async function handlePaymentSuccess(
         user_id: userId,
         amount: event.payment.amount,
         currency: "USD",
-        status: "paid",
+        status: "succeeded",
         provider: "venflow",
         provider_payment_id: event.payment.id,
         paid_at: now.toISOString(),
