@@ -166,10 +166,49 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
         })}
       </nav>
 
+      <Link
+        href="/app/plan"
+        className="mt-auto mb-3 flex flex-col gap-2 rounded-2xl p-4 no-underline transition-colors hover:opacity-90"
+        style={{
+          backgroundColor: "var(--accent-soft-bg)",
+          border: "1px solid var(--border)",
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <span
+            className="flex h-7 w-7 items-center justify-center rounded-full"
+            style={{
+              backgroundColor: "var(--rial)",
+              color: "var(--text-on-accent)",
+            }}
+          >
+            <Sparkles width={14} height={14} />
+          </span>
+          <span
+            className="text-sm font-semibold"
+            style={{ color: "var(--text-primary)" }}
+          >
+            Rial Plus
+          </span>
+        </div>
+        <p
+          className="text-xs leading-snug"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          Desbloquea cuentas ilimitadas, presupuestos y reportes avanzados.
+        </p>
+        <span
+          className="mt-1 text-xs font-semibold"
+          style={{ color: "var(--accent-soft-icon)" }}
+        >
+          Mejorar plan →
+        </span>
+      </Link>
+
       <Dropdown>
         <Dropdown.Trigger
           aria-label="Menú de usuario"
-          className="mt-auto flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2 text-left transition-colors hover:bg-[var(--card-bg-hover)]"
+          className="flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2 text-left transition-colors hover:bg-[var(--card-bg-hover)]"
         >
           <Avatar size="md">
             <Avatar.Fallback>

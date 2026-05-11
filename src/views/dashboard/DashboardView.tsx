@@ -17,16 +17,10 @@ import {
 
 type CurrencyCode = "USD" | "EUR" | "USDT";
 
-type CurrencyInfo = {
-  symbol: string;
-  balance: number;
-  changePct: number;
-};
-
-const currencies: Record<CurrencyCode, CurrencyInfo> = {
-  USD: { symbol: "$", balance: 230.32, changePct: 5.3 },
-  EUR: { symbol: "€", balance: 213.45, changePct: -1.2 },
-  USDT: { symbol: "$", balance: 230.3, changePct: 0.05 },
+const currencySymbol: Record<CurrencyCode, string> = {
+  USD: "$",
+  EUR: "€",
+  USDT: "$",
 };
 
 const currencyOrder: CurrencyCode[] = ["USD", "EUR", "USDT"];
@@ -52,24 +46,6 @@ type BalanceCardItem = {
   href: string;
 };
 
-const balances: BalanceCardItem[] = [
-  {
-    code: "VES",
-    flag: "🇻🇪",
-    currency: "Bolívares",
-    amount: "Bs 115.127,51",
-    equivalent: "≈ $230.32",
-    href: "/app/cuentas/ves",
-  },
-  {
-    code: "USD",
-    flag: "🇺🇸",
-    currency: "Dólares",
-    amount: "$ 0.00",
-    href: "/app/cuentas/usd",
-  },
-];
-
 type MoneyFlow = {
   type: "income" | "expense";
   label: string;
@@ -77,34 +53,165 @@ type MoneyFlow = {
   href: string;
 };
 
-const moneyFlows: MoneyFlow[] = [
-  {
-    type: "income",
-    label: "Ingresos",
-    amount: "$ 0.00",
-    href: "/app/movimientos?tipo=ingresos",
-  },
-  {
-    type: "expense",
-    label: "Gastos",
-    amount: "$ 10.00",
-    href: "/app/movimientos?tipo=gastos",
-  },
-];
-
 type ExchangeRate = {
   code: CurrencyCode;
   label: string;
   rate: string;
 };
 
-const exchangeRates: ExchangeRate[] = [
-  { code: "USD", label: "Dólar", rate: "Bs 36,50" },
-  { code: "EUR", label: "Euro", rate: "Bs 39,20" },
-  { code: "USDT", label: "Tether", rate: "Bs 38,10" },
-];
+export type DashboardData = {
+  balances: { currency: string; balance: number; balanceUsd: number }[];
+  income: number;
+  expense: number;
+  rates: {
+    code: string;
+    price: number;
+    priceYesterday: number | null;
+    source: string;
+  }[];
+  totalUsd: number;
+  eurUsd: number | null;
+};
 
-function ExchangeRatesCard() {
+const currencyMeta: Record<string, { flag: string; label: string; href: string }> = {
+  VES: { flag: "🇻🇪", label: "Bolívares", href: "/app/cuentas/ves" },
+  USD: { flag: "🇺🇸", label: "Dólares", href: "/app/cuentas/usd" },
+  EUR: { flag: "🇪🇺", label: "Euros", href: "/app/cuentas/eur" },
+};
+
+const rateLabels: Record<string, string> = {
+  USD: "Dólar",
+  EUR: "Euro",
+  USDT: "Tether",
+};
+
+const vesFormatter = new Intl.NumberFormat("es-VE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const usdFormatter = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const eurFormatter = new Intl.NumberFormat("de-DE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+function formatBalance(currency: string, value: number): string {
+  if (currency === "VES") return `Bs ${vesFormatter.format(value)}`;
+  if (currency === "EUR") return `€ ${eurFormatter.format(value)}`;
+  return `$ ${usdFormatter.format(value)}`;
+}
+
+function formatUsd(value: number): string {
+  return `$ ${usdFormatter.format(value)}`;
+}
+
+function buildBalances(items: DashboardData["balances"]): BalanceCardItem[] {
+  return items.map((item) => {
+    const meta = currencyMeta[item.currency] ?? {
+      flag: "💱",
+      label: item.currency,
+      href: "/app/cuentas",
+    };
+    const card: BalanceCardItem = {
+      code: item.currency,
+      flag: meta.flag,
+      currency: meta.label,
+      amount: formatBalance(item.currency, item.balance),
+      href: meta.href,
+    };
+    if (item.currency !== "USD") {
+      card.equivalent = `≈ ${formatUsd(item.balanceUsd)}`;
+    }
+    return card;
+  });
+}
+
+function buildMoneyFlows(data: DashboardData): MoneyFlow[] {
+  return [
+    {
+      type: "income",
+      label: "Ingresos",
+      amount: formatUsd(data.income),
+      href: "/app/movimientos?tipo=ingresos",
+    },
+    {
+      type: "expense",
+      label: "Gastos",
+      amount: formatUsd(data.expense),
+      href: "/app/movimientos?tipo=gastos",
+    },
+  ];
+}
+
+function buildExchangeRates(rates: DashboardData["rates"]): ExchangeRate[] {
+  return rates
+    .filter(
+      (
+        r,
+      ): r is {
+        code: CurrencyCode;
+        price: number;
+        priceYesterday: number | null;
+        source: string;
+      } => r.code === "USD" || r.code === "EUR" || r.code === "USDT",
+    )
+    .map((r) => ({
+      code: r.code,
+      label: rateLabels[r.code] ?? r.code,
+      rate: `Bs ${vesFormatter.format(r.price)}`,
+    }));
+}
+
+function computeHero(
+  data: DashboardData,
+  code: CurrencyCode,
+): { balance: number; changePct: number } {
+  const targetRate = data.rates.find((r) => r.code === code);
+  const changePct =
+    targetRate && targetRate.priceYesterday && targetRate.priceYesterday > 0
+      ? ((targetRate.price - targetRate.priceYesterday) / targetRate.priceYesterday) *
+        100
+      : 0;
+
+  let total = 0;
+  for (const b of data.balances) {
+    if (b.currency === "VES") {
+      if (targetRate && targetRate.price > 0) {
+        total += b.balance / targetRate.price;
+      }
+      continue;
+    }
+    if (b.currency === "USD") {
+      if (code === "USD" || code === "USDT") {
+        total += b.balance;
+      } else if (code === "EUR" && data.eurUsd && data.eurUsd > 0) {
+        total += b.balance / data.eurUsd;
+      }
+      continue;
+    }
+    if (b.currency === "EUR") {
+      if (code === "EUR") {
+        total += b.balance;
+      } else if ((code === "USD" || code === "USDT") && data.eurUsd) {
+        total += b.balance * data.eurUsd;
+      }
+      continue;
+    }
+  }
+
+  return { balance: total, changePct };
+}
+
+function ExchangeRatesCard({
+  rates,
+  source,
+}: {
+  rates: ExchangeRate[];
+  source: string;
+}) {
   return (
     <article
       className="rounded-[30px] p-6"
@@ -121,11 +228,11 @@ function ExchangeRatesCard() {
           className="text-xs font-medium"
           style={{ color: "var(--text-muted)" }}
         >
-          BCV
+          {source}
         </span>
       </header>
       <ul className="flex flex-col gap-3">
-        {exchangeRates.map((item) => (
+        {rates.map((item) => (
           <li
             key={item.code}
             className="flex items-center justify-between gap-3"
@@ -256,17 +363,23 @@ function BalanceAccountCard({ item }: { item: BalanceCardItem }) {
   );
 }
 
-export function DashboardView() {
+export function DashboardView({ data }: { data: DashboardData }) {
   const [isVisible, setIsVisible] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState<Selection>(
     new Set<CurrencyCode>(["USD"])
   );
 
+  const balanceCards = buildBalances(data.balances);
+  const moneyFlows = buildMoneyFlows(data);
+  const exchangeRates = buildExchangeRates(data.rates);
+  const ratesSource = data.rates[0]?.source ?? "BCV";
+
   const selectedCode =
     (selectedKeys !== "all" &&
       (Array.from(selectedKeys)[0] as CurrencyCode)) ||
     "USD";
-  const current = currencies[selectedCode];
+  const current = computeHero(data, selectedCode);
+  const symbol = "$";
   const isPositive = current.changePct >= 0;
   const TrendIcon = isPositive ? CaretUp : CaretDown;
 
@@ -333,11 +446,11 @@ export function DashboardView() {
         <div className="flex items-center gap-3">
           <span className="display-heading text-[clamp(2rem,4vw,3rem)]">
             {isVisible
-              ? `${current.symbol} ${current.balance.toLocaleString("es-VE", {
+              ? `${symbol} ${current.balance.toLocaleString("es-VE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}`
-              : `${current.symbol} ••••••`}
+              : `${symbol} ••••••`}
           </span>
           <Chip
             color={isPositive ? "success" : "danger"}
@@ -361,9 +474,18 @@ export function DashboardView() {
           Mis Balances
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {balances.map((item) => (
-            <BalanceAccountCard key={item.code} item={item} />
-          ))}
+          {balanceCards.length === 0 ? (
+            <p
+              className="text-sm"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Aún no tienes cuentas registradas.
+            </p>
+          ) : (
+            balanceCards.map((item) => (
+              <BalanceAccountCard key={item.code} item={item} />
+            ))
+          )}
         </div>
       </section>
       </div>
@@ -372,7 +494,7 @@ export function DashboardView() {
         {moneyFlows.map((item) => (
           <MoneyFlowCard key={item.type} item={item} />
         ))}
-        <ExchangeRatesCard />
+        <ExchangeRatesCard rates={exchangeRates} source={ratesSource} />
       </aside>
     </div>
   );
