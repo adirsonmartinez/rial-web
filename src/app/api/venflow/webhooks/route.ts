@@ -64,13 +64,14 @@ export async function POST(request: NextRequest) {
       }
     }
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error(
       "[venflow webhook] error processing",
       event.eventType,
       err,
     );
     return NextResponse.json(
-      { received: true, error: "processing_failed" },
+      { received: true, error: "processing_failed", message },
       { status: 500 },
     );
   }

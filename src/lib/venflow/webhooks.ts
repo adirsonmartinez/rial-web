@@ -66,24 +66,30 @@ async function resolveUserId(
     }
   }
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("subscriptions")
     .select("user_id")
     .eq("provider", "venflow")
     .eq("provider_customer_id", event.client.id)
     .maybeSingle();
 
+  if (error) {
+    throw new Error(`resolveUserId fallback query failed: ${error.message}`);
+  }
   return (data?.user_id as string | undefined) ?? null;
 }
 
 async function getPlusPlanId(
   supabase: AdminSupabaseClient,
 ): Promise<string | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("subscription_plans")
     .select("id")
     .eq("name", "plus")
     .maybeSingle();
+  if (error) {
+    throw new Error(`getPlusPlanId query failed: ${error.message}`);
+  }
   return (data?.id as string | undefined) ?? null;
 }
 
