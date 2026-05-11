@@ -171,11 +171,35 @@ export function CheckoutView({ cadence }: { cadence: Cadence }) {
   const pricing = cadenceCatalog[cadence];
   const [selectedMethod, setSelectedMethod] =
     useState<PaymentMethodId>("domiciliacion");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const subtotal = pricing.totalUsd;
   const taxRate = 0.16;
   const tax = +(subtotal * taxRate).toFixed(2);
   const total = +(subtotal + tax).toFixed(2);
+
+  async function handleContinue() {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    try {
+      const res = await fetch("/api/venflow/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cadence }),
+      });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || !data.url) {
+        setErrorMessage(data.error ?? "No pudimos iniciar el checkout");
+        setIsSubmitting(false);
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      setErrorMessage("Error de red. Inténtalo de nuevo.");
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1100px] px-6 py-8">
@@ -311,9 +335,25 @@ export function CheckoutView({ cadence }: { cadence: Cadence }) {
             ))}
           </div>
 
-          <Button variant="primary" fullWidth className="h-12">
-            Continuar
+          <Button
+            variant="primary"
+            fullWidth
+            className="h-12"
+            onClick={handleContinue}
+            isDisabled={isSubmitting}
+          >
+            {isSubmitting ? "Redirigiendo…" : "Continuar"}
           </Button>
+
+          {errorMessage && (
+            <p
+              className="text-xs"
+              style={{ color: "rgb(220, 38, 38)" }}
+              role="alert"
+            >
+              {errorMessage}
+            </p>
+          )}
 
           <div
             className="flex items-center gap-2 text-xs"

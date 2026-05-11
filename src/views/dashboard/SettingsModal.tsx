@@ -147,7 +147,14 @@ function SubscriptionSection() {
           style={{ backgroundColor: "var(--border)" }}
         />
 
-        <Button render={(props) => <Link {...props} href="/app/plan" />}>
+        <Button
+          render={(props) => (
+            <Link
+              {...(props as unknown as React.ComponentProps<typeof Link>)}
+              href="/app/plan"
+            />
+          )}
+        >
           Ver planes y mejorar
         </Button>
       </article>
