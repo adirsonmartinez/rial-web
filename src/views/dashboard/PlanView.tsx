@@ -19,6 +19,7 @@ type CadenceInfo = {
   totalPrice: string;
   helper: string;
   discountPct?: number;
+  available: boolean;
 };
 
 const cadences: CadenceInfo[] = [
@@ -28,6 +29,7 @@ const cadences: CadenceInfo[] = [
     monthlyEquivalent: "$4,99",
     totalPrice: "$4,99",
     helper: "USD / mes · facturado mensualmente",
+    available: true,
   },
   {
     id: "trimestral",
@@ -36,6 +38,7 @@ const cadences: CadenceInfo[] = [
     totalPrice: "$13,49",
     helper: "USD / mes · facturado trimestralmente ($13,49)",
     discountPct: 10,
+    available: false,
   },
   {
     id: "semestral",
@@ -44,6 +47,7 @@ const cadences: CadenceInfo[] = [
     totalPrice: "$23,99",
     helper: "USD / mes · facturado semestralmente ($23,99)",
     discountPct: 20,
+    available: false,
   },
   {
     id: "anual",
@@ -52,6 +56,7 @@ const cadences: CadenceInfo[] = [
     totalPrice: "$41,99",
     helper: "USD / mes · facturado anualmente ($41,99)",
     discountPct: 30,
+    available: false,
   },
 ];
 
@@ -217,9 +222,14 @@ function PlusPlanCard({ cadence }: { cadence: CadenceInfo }) {
             >
               {cadence.monthlyEquivalent}
             </span>
-            {cadence.discountPct && (
+            {cadence.available && cadence.discountPct && (
               <Chip color="success" variant="soft" size="sm">
                 Ahorra {cadence.discountPct}%
+              </Chip>
+            )}
+            {!cadence.available && (
+              <Chip color="warning" variant="soft" size="sm">
+                Próximamente
               </Chip>
             )}
           </div>
@@ -229,19 +239,25 @@ function PlusPlanCard({ cadence }: { cadence: CadenceInfo }) {
         </div>
       </header>
 
-      <Button
-        variant="primary"
-        fullWidth
-        className="h-11"
-        render={(props) => (
-          <Link
-            {...(props as unknown as React.ComponentProps<typeof Link>)}
-            href={checkoutHref}
-          />
-        )}
-      >
-        {plusPlan.ctaLabel}
-      </Button>
+      {cadence.available ? (
+        <Button
+          variant="primary"
+          fullWidth
+          className="h-11"
+          render={(props) => (
+            <Link
+              {...(props as unknown as React.ComponentProps<typeof Link>)}
+              href={checkoutHref}
+            />
+          )}
+        >
+          {plusPlan.ctaLabel}
+        </Button>
+      ) : (
+        <Button variant="primary" fullWidth className="h-11" isDisabled>
+          Próximamente
+        </Button>
+      )}
 
       <div
         className="h-px w-full"
