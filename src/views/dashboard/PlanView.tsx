@@ -169,6 +169,7 @@ function FreePlanCard() {
 
 function PlusPlanCard({ cadence }: { cadence: CadenceInfo }) {
   const Icon = plusPlan.icon;
+  const checkoutHref = `/app/checkout?cadence=${cadence.id}`;
   return (
     <article
       className="relative flex h-full flex-col gap-6 rounded-[30px] p-8"
@@ -228,7 +229,17 @@ function PlusPlanCard({ cadence }: { cadence: CadenceInfo }) {
         </div>
       </header>
 
-      <Button variant="primary" fullWidth className="h-11">
+      <Button
+        variant="primary"
+        fullWidth
+        className="h-11"
+        render={(props) => (
+          <Link
+            {...(props as unknown as React.ComponentProps<typeof Link>)}
+            href={checkoutHref}
+          />
+        )}
+      >
         {plusPlan.ctaLabel}
       </Button>
 
