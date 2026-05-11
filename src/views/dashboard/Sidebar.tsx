@@ -120,7 +120,7 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
   return (
     <aside
       aria-label="Navegación principal"
-      className="sticky top-0 flex h-screen w-[280px] shrink-0 flex-col px-4 py-6"
+      className="flex h-full w-[280px] shrink-0 flex-col px-4 py-6"
       style={{
         backgroundColor: "var(--bg-secondary)",
         borderRight: "1px solid var(--border)",

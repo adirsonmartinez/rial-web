@@ -24,8 +24,11 @@ export function Topbar({ userName, onToggleSidebar }: TopbarProps) {
 
   return (
     <header
-      className="sticky top-0 z-30 flex h-16 items-center gap-3 px-6"
-      style={{ backgroundColor: "var(--bg-secondary)" }}
+      className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 px-6"
+      style={{
+        backgroundColor: "var(--bg-secondary)",
+        borderBottom: "1px solid var(--border)",
+      }}
     >
       <button
         type="button"

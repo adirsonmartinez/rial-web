@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 import {
@@ -111,17 +112,17 @@ function PaymentMethodCard({
         backgroundColor: isSelected
           ? "var(--accent-soft-bg)"
           : "var(--bg-card)",
-        border: `1.5px solid ${isSelected ? "var(--accent)" : "var(--border)"}`,
+        border: `1.5px solid ${isSelected ? "var(--accent-soft-icon)" : "var(--border)"}`,
       }}
     >
       <span
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
         style={{
           backgroundColor: isSelected
-            ? "var(--accent)"
+            ? "var(--accent-soft-bg)"
             : "var(--card-bg-subtle)",
           color: isSelected
-            ? "var(--accent-foreground)"
+            ? "var(--accent-soft-icon)"
             : "var(--text-primary)",
         }}
       >
@@ -154,11 +155,10 @@ function PaymentMethodCard({
       </div>
 
       <span
-        className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+        className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${isSelected ? "text-white dark:text-black" : ""}`}
         style={{
-          backgroundColor: isSelected ? "var(--accent)" : "transparent",
-          border: `1.5px solid ${isSelected ? "var(--accent)" : "var(--border)"}`,
-          color: "var(--accent-foreground)",
+          backgroundColor: isSelected ? "var(--accent-soft-icon)" : "transparent",
+          border: `1.5px solid ${isSelected ? "var(--accent-soft-icon)" : "var(--border)"}`,
         }}
       >
         {isSelected && <Check width={12} height={12} />}
@@ -355,8 +355,39 @@ export function CheckoutView({ cadence }: { cadence: Cadence }) {
             </p>
           )}
 
+          {selectedMethod === "domiciliacion" && (
+            <div
+              className="flex items-center justify-center gap-1.5 text-xs"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <span>Powered by</span>
+              <a
+                href="https://www.venflow.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center opacity-60 transition-opacity hover:opacity-90"
+                aria-label="Venflow"
+              >
+                <Image
+                  src="/logos/venflow-black.png"
+                  alt="Venflow"
+                  width={60}
+                  height={16}
+                  className="block h-auto dark:hidden"
+                />
+                <Image
+                  src="/logos/venflow-white.png"
+                  alt="Venflow"
+                  width={60}
+                  height={16}
+                  className="hidden h-auto dark:block"
+                />
+              </a>
+            </div>
+          )}
+
           <div
-            className="flex items-center gap-2 text-xs"
+            className="flex items-center justify-center gap-2 text-xs"
             style={{ color: "var(--text-muted)" }}
           >
             <ShieldCheck width={14} height={14} />

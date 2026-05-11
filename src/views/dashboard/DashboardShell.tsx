@@ -19,17 +19,17 @@ export function DashboardShell({
 
   return (
     <div
-      className="flex min-h-screen"
+      className="flex h-screen overflow-hidden"
       style={{ backgroundColor: "var(--bg-secondary)" }}
     >
       <div
-        className={`${isSidebarOpen ? "w-[280px]" : "w-0"} shrink-0 overflow-hidden transition-[width] duration-300 ease-out`}
+        className={`${isSidebarOpen ? "w-[280px]" : "w-0"} h-full shrink-0 overflow-hidden transition-[width] duration-300 ease-out`}
       >
-        <div className="w-[280px]">
+        <div className="h-full w-[280px]">
           <Sidebar userEmail={userEmail} userName={userName} />
         </div>
       </div>
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
         <Topbar
           userName={userName}
           onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
