@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AppStoreBadge, GooglePlayBadge } from "./StoreBadges";
-import { LogoCarousel } from "./LogoCarousel";
+// import { LogoCarousel } from "./LogoCarousel";
 import { useUserCount, formatExactCount } from "@/views/shared/useUserCount";
 
 const AVATARS = [
@@ -142,7 +142,7 @@ export function HeroSection() {
           </div>
         </div>
       </div>
-      <LogoCarousel />
+      {/* <LogoCarousel /> */}
     </section>
   );
 }

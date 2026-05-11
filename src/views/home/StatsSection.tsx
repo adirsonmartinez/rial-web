@@ -26,9 +26,25 @@ export function StatsSection() {
           </h2>
           <p className="max-w-xl text-base lg:text-lg" style={{ lineHeight: 1.6, color: "var(--text-secondary)" }}>
             Rial es la app que los venezolanos eligen para organizar sus finanzas. Con valoraciones en{" "}
-            <a href="#" className="font-medium underline" style={{ color: "var(--text-primary)" }}>App Store</a>
+            <a
+              href="https://apps.apple.com/us/app/rial-finanzas-personales/id6755372307"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium underline"
+              style={{ color: "var(--text-primary)" }}
+            >
+              App Store
+            </a>
             {" "}y{" "}
-            <a href="#" className="font-medium underline" style={{ color: "var(--text-primary)" }}>Google Play</a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.adimtnez.rial&hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium underline"
+              style={{ color: "var(--text-primary)" }}
+            >
+              Google Play
+            </a>
             {" "}que lo respaldan. Únete a miles de personas que ya confían en Rial.
           </p>
         </div>

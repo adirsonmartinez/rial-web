@@ -2,20 +2,7 @@
 
 import Image from "next/image";
 
-const NAV_COLUMNS = [
-  {
-    title: "Producto",
-    links: ["Cuentas", "Presupuestos", "Metas", "Calculadora", "Plantillas"],
-  },
-  {
-    title: "Aprende",
-    links: ["Preguntas frecuentes", "Centro de ayuda", "Blog"],
-  },
-  {
-    title: "Empresa",
-    links: ["Nosotros", "Contacto", "Política de privacidad"],
-  },
-];
+const COMPANY_LINKS = ["Nosotros", "Contacto", "Política de privacidad"];
 
 function AppleIcon() {
   return (
@@ -53,14 +40,18 @@ export function Footer() {
             {/* Download buttons */}
             <div className="flex gap-2 mt-2">
               <a
-                href="#"
+                href="https://apps.apple.com/us/app/rial-finanzas-personales/id6755372307"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Descargar en App Store"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-[#ACE524] hover:text-[#161616] transition-colors"
               >
                 <AppleIcon />
               </a>
               <a
-                href="#"
+                href="https://play.google.com/store/apps/details?id=com.adimtnez.rial&hl=en"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Descargar en Google Play"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-[#ACE524] hover:text-[#161616] transition-colors"
               >
@@ -90,50 +81,44 @@ export function Footer() {
         {/* Divider */}
         <div className="my-12" style={{ borderTop: "1px dashed rgba(255,255,255,0.1)" }} />
 
-        {/* Middle: contact + nav columns */}
-        <div className="flex flex-col gap-10 lg:flex-row lg:justify-between">
-          <div className="flex flex-col gap-3">
-            <p className="text-sm text-white/40">Hablemos</p>
-            <a href="mailto:soporte@somosrial.com" className="inline-flex items-center gap-3 text-xl font-medium text-white hover:text-[#ACE524] lg:text-2xl">
-              soporte@somosrial.com
-              <span className="text-white/40">↗</span>
-            </a>
-          </div>
-
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:gap-16">
-            {NAV_COLUMNS.map((col) => (
-              <div key={col.title} className="flex flex-col gap-3">
-                <p className="text-sm font-medium text-white">{col.title}</p>
-                {col.links.map((link) => (
-                  <a key={link} href="#" className="text-sm text-white/50 hover:text-white transition-colors">
-                    {link}
-                  </a>
-                ))}
-              </div>
-            ))}
-          </div>
+        {/* Middle: contact */}
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-white/40">Hablemos</p>
+          <a href="mailto:soporte@somosrial.com" className="inline-flex items-center gap-3 text-xl font-medium text-white hover:text-[#ACE524] lg:text-2xl">
+            soporte@somosrial.com
+            <span className="text-white/40">↗</span>
+          </a>
         </div>
 
         {/* Divider */}
         <div className="my-10" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }} />
 
-        {/* Bottom: copyright + venflow + social */}
+        {/* Bottom: company links + copyright + venflow + social */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="flex items-center gap-4">
-            <p className="text-xs text-white/30">
-              © {new Date().getFullYear()} Rial. Todos los derechos reservados.
-            </p>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-white/30">Pagos por</span>
-              <a href="https://www.venflow.app/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80">
-                <Image
-                  src="/logos/venflow-white.png"
-                  alt="Venflow"
-                  width={60}
-                  height={16}
-                  className="h-auto opacity-40 hover:opacity-70 transition-opacity"
-                />
-              </a>
+          <div className="flex flex-col items-center gap-3 sm:items-start">
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:justify-start">
+              {COMPANY_LINKS.map((link) => (
+                <a key={link} href="#" className="text-sm text-white/60 hover:text-white transition-colors">
+                  {link}
+                </a>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-start">
+              <p className="text-xs text-white/30">
+                © {new Date().getFullYear()} Rial. Todos los derechos reservados.
+              </p>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-white/30">Pagos por</span>
+                <a href="https://www.venflow.app/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80">
+                  <Image
+                    src="/logos/venflow-white.png"
+                    alt="Venflow"
+                    width={60}
+                    height={16}
+                    className="h-auto opacity-40 hover:opacity-70 transition-opacity"
+                  />
+                </a>
+              </div>
             </div>
           </div>
           <div className="flex gap-3">

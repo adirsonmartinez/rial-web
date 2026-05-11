@@ -1,6 +1,12 @@
 export function AppStoreBadge() {
   return (
-    <a href="#" aria-label="Descargar en App Store" className="inline-block">
+    <a
+      href="https://apps.apple.com/us/app/rial-finanzas-personales/id6755372307"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Descargar en App Store"
+      className="inline-block"
+    >
       <svg width="165" height="54" viewBox="0 0 165 54" xmlns="http://www.w3.org/2000/svg">
         <rect width="165" height="54" rx="27" fill="#000" />
         <g fill="#fff">
@@ -15,7 +21,13 @@ export function AppStoreBadge() {
 
 export function GooglePlayBadge() {
   return (
-    <a href="#" aria-label="Disponible en Google Play" className="inline-block">
+    <a
+      href="https://play.google.com/store/apps/details?id=com.adimtnez.rial&hl=en"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Disponible en Google Play"
+      className="inline-block"
+    >
       <svg width="175" height="54" viewBox="0 0 175 54" xmlns="http://www.w3.org/2000/svg">
         <rect width="175" height="54" rx="27" fill="#000" />
         <g>
