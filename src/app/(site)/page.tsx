@@ -1,4 +1,5 @@
-import { HeroSection } from "@/views/home/HeroSection";
+import { HeroSectionV2 } from "@/views/home/HeroSectionV2";
+import { BrandsBanner } from "@/views/home/BrandsBanner";
 import { SolutionSection } from "@/views/home/SolutionSection";
 import { FeaturesSection } from "@/views/home/FeaturesSection";
 import { StatsSection } from "@/views/home/StatsSection";
@@ -13,7 +14,8 @@ export default function Home() {
   return (
     <div className="flex-1">
       <IntroOverlay />
-      <HeroSection />
+      <HeroSectionV2 />
+      <BrandsBanner />
       <SolutionSection />
       <FeaturesSection />
       <StatsSection />
