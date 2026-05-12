@@ -1,96 +1,138 @@
-"use client";
+import Link from "next/link";
+import {
+  ChartPie,
+  Clock,
+  Sparkles,
+  TargetDart,
+} from "@gravity-ui/icons";
 
-import Image from "next/image";
-import { useState } from "react";
+type FloatingPill = {
+  icon: React.ComponentType<{ width?: number; height?: number }>;
+  position: string;
+  iconSize: number;
+};
 
-const SEGMENTS = [
+const FLOATING_PILLS: FloatingPill[] = [
   {
-    id: "organizar",
-    label: "Organizar",
-    description:
-      "Registra y visualiza todos tus ingresos y gastos en un solo lugar. Sabe exactamente a dónde va cada rial.",
-    image: "https://images.unsplash.com/photo-1506784242126-2a0b0b89c56a?w=1200&q=80&auto=format&fit=crop",
-    imageAlt: "Planificador con pluma sobre un escritorio",
+    icon: ChartPie,
+    position: "top-6 left-4 lg:top-10 lg:left-16",
+    iconSize: 56,
   },
   {
-    id: "ahorrar",
-    label: "Ahorrar",
-    description:
-      "Define metas, crea presupuestos y haz seguimiento de tu progreso para alcanzar tus objetivos financieros.",
-    image: "https://images.unsplash.com/photo-1488398729765-41b1c297157d?w=1200&q=80&auto=format&fit=crop",
-    imageAlt: "Alcancía blanca junto a monedas apiladas",
+    icon: Clock,
+    position: "top-40 right-4 lg:top-32 lg:right-16",
+    iconSize: 56,
   },
   {
-    id: "convertir",
-    label: "Convertir",
-    description:
-      "Gestiona bolívares, dólares y euros con tasas actualizadas. Siempre sabrás cuánto vale tu dinero.",
-    image: "https://images.unsplash.com/photo-1764865988307-a7abe207fa1d?w=1200&q=80&auto=format&fit=crop",
-    imageAlt: "Billetes de dólares y euros sobre una superficie",
+    icon: TargetDart,
+    position: "bottom-32 left-4 lg:bottom-24 lg:left-24",
+    iconSize: 56,
+  },
+  {
+    icon: Sparkles,
+    position: "bottom-6 right-4 lg:bottom-12 lg:right-16",
+    iconSize: 56,
   },
 ];
 
 export function SolutionSection() {
-  const [activeId, setActiveId] = useState("organizar");
-  const active = SEGMENTS.find((s) => s.id === activeId)!;
-
   return (
-    <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
-      <div className="relative mx-auto max-w-7xl px-6 lg:min-h-[720px]">
-        {/* Title — top left */}
-        <div className="flex items-center gap-2 mb-10">
-          <div className="h-2.5 w-2.5 rounded-full bg-[#ACE524]" />
-          <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>¿Qué puedes hacer con Rial?</p>
+    <section
+      id="solucion"
+      className="relative w-full overflow-hidden py-24 lg:py-32"
+      style={{ backgroundColor: "var(--bg-primary)" }}
+    >
+      {/* Subtle grid backdrop */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
+          backgroundSize: "72px 72px",
+          maskImage:
+            "radial-gradient(ellipse 60% 50% at 50% 50%, black 0%, transparent 75%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 60% 50% at 50% 50%, black 0%, transparent 75%)",
+          opacity: 0.5,
+        }}
+      />
+
+      {/* Floating decorative pills */}
+      {FLOATING_PILLS.map(({ icon: Icon, position, iconSize }, i) => (
+        <div
+          key={i}
+          aria-hidden="true"
+          className={`pointer-events-none absolute hidden h-24 w-44 items-center justify-center rounded-full sm:flex lg:h-28 lg:w-52 ${position}`}
+          style={{ backgroundColor: "var(--accent-soft-bg)" }}
+        >
+          <span style={{ color: "var(--accent-soft-icon)" }}>
+            <Icon width={iconSize} height={iconSize} />
+          </span>
         </div>
+      ))}
 
-        {/* Image — top right, aligned with title */}
-        <div className="relative mb-10 lg:absolute lg:top-0 lg:right-6 lg:w-[48%] lg:mb-0">
-          <div className="relative w-full overflow-hidden rounded-[30px] h-[450px] lg:h-[720px]" style={{ backgroundColor: "var(--card-bg-subtle)" }}>
-            {SEGMENTS.map((segment) => (
-              <Image
-                key={segment.id}
-                src={segment.image}
-                alt={segment.imageAlt}
-                fill
-                sizes="(min-width: 1024px) 48vw, 100vw"
-                priority={segment.id === "organizar"}
-                className="object-cover transition-opacity duration-500 ease-out"
-                style={{ opacity: segment.id === activeId ? 1 : 0 }}
-              />
-            ))}
-          </div>
-        </div>
+      {/* Center content */}
+      <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-6 text-center">
+        <h2
+          className="display-heading text-[clamp(2rem,5vw,3.75rem)]"
+          style={{ lineHeight: 1.1 }}
+        >
+          Nuestra app es la solución todo en uno para gestionar tu dinero y tus metas financieras.
+        </h2>
 
-        {/* Left content — pushed to the bottom */}
-        <div className="flex flex-col justify-end gap-8 lg:w-[48%] lg:min-h-[660px]">
-          {/* Segment tabs */}
-          <div className="flex flex-col gap-2">
-            {SEGMENTS.map((segment) => (
-              <button
-                key={segment.id}
-                onClick={() => setActiveId(segment.id)}
-                className="text-left font-[family-name:var(--font-sora)] font-[800] cursor-pointer transition-all duration-300 ease-out origin-left text-4xl lg:text-5xl"
-                style={{
-                  lineHeight: 1.2,
-                  color: segment.id === activeId ? "var(--text-primary)" : "var(--text-muted)",
-                  transform: segment.id === activeId ? "scale(1.1)" : "scale(1)",
-                }}
-              >
-                {segment.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Description */}
-          <p className="max-w-md text-base lg:text-lg" style={{ lineHeight: 1.6, color: "var(--text-secondary)" }}>
-            {active.description}
+        <div className="mt-12 flex w-full items-center justify-center gap-4 lg:gap-6">
+          <span
+            aria-hidden="true"
+            className="h-px w-10 shrink-0 lg:w-16"
+            style={{ backgroundColor: "var(--accent)" }}
+          />
+          <p
+            className="max-w-md text-sm lg:text-base"
+            style={{ color: "var(--text-secondary)", lineHeight: 1.5 }}
+          >
+            Vive la tranquilidad de tener tus finanzas bajo control desde un solo lugar.
           </p>
-
-          <a href="#" className="btn-pill btn-secondary inline-flex items-center gap-2 self-start text-sm">
-            Conoce más
-            <span>→</span>
-          </a>
+          <span
+            aria-hidden="true"
+            className="h-px w-10 shrink-0 lg:w-16"
+            style={{ backgroundColor: "var(--accent)" }}
+          />
         </div>
+
+        <Link
+          href="#descargar"
+          className="group mt-10 inline-flex items-center gap-2 rounded-full p-1.5 pl-7 transition-colors"
+          style={{ backgroundColor: "var(--accent-soft-bg)" }}
+        >
+          <span
+            className="text-base font-medium lg:text-lg"
+            style={{ color: "var(--accent-soft-icon)" }}
+          >
+            Empieza gratis
+          </span>
+          <span
+            className="flex h-12 w-12 items-center justify-center rounded-full transition-transform group-hover:scale-105"
+            style={{
+              backgroundColor: "var(--accent)",
+              color: "var(--accent-foreground)",
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="7" y1="17" x2="17" y2="7" />
+              <polyline points="7 7 17 7 17 17" />
+            </svg>
+          </span>
+        </Link>
       </div>
     </section>
   );

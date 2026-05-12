@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CircleQuestion } from "@gravity-ui/icons";
 
 const FAQS = [
   {
@@ -74,12 +75,16 @@ export function FaqSection() {
       <div className="mx-auto max-w-3xl px-6">
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-4 mb-12">
-          <div className="flex items-center gap-2">
-            <div className="h-2.5 w-2.5 rounded-full bg-[#ACE524]" />
-            <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-              FAQ&apos;s
-            </p>
-          </div>
+          <span
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em]"
+            style={{
+              backgroundColor: "var(--card-bg-subtle)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            <CircleQuestion width={12} height={12} />
+            FAQ&apos;s
+          </span>
           <h2 className="display-heading text-[clamp(2rem,4vw,3rem)]">
             Preguntas frecuentes
           </h2>

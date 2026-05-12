@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Persons } from "@gravity-ui/icons";
 
 const TEAM = [
   { name: "Rafael Graziani", role: "CEO & Co-founder", linkedin: "https://www.linkedin.com/in/ragraziani", photo: "/founders/rafael-graziani.png" },
@@ -23,12 +24,16 @@ export function TeamSection() {
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-4 mb-16">
-          <div className="flex items-center gap-2">
-            <div className="h-2.5 w-2.5 rounded-full bg-[#ACE524]" />
-            <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-              Equipo
-            </p>
-          </div>
+          <span
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em]"
+            style={{
+              backgroundColor: "var(--card-bg-subtle)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            <Persons width={12} height={12} />
+            Equipo
+          </span>
           <h2 className="display-heading text-[clamp(2rem,4vw,3rem)]">
             Los que hacen Rial posible
           </h2>

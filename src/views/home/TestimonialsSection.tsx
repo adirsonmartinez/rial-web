@@ -1,119 +1,172 @@
 import Image from "next/image";
 
-const REVIEWS = [
-  {
-    text: "Por fin una app que entiende cómo manejamos el dinero en Venezuela. Veo mis bolívares, dólares y euros en un solo lugar.",
-    author: "María González",
-    avatar: "https://i.pravatar.cc/100?img=47",
-    time: "hace 6 horas",
-  },
-  {
-    text: "Las metas y presupuestos me cambiaron la rutina. Logré ahorrar para mi próximo viaje mucho antes de lo que pensaba.",
-    author: "Carlos Pérez",
-    avatar: "https://i.pravatar.cc/100?img=12",
-    time: "3 oct, 2025",
-  },
-  {
-    text: "El equipo escucha a sus usuarios. Cada actualización trae justo lo que estaba esperando.",
-    author: "Andrea Méndez",
-    avatar: "https://i.pravatar.cc/100?img=32",
-    time: "hace 2 días",
-  },
+const AVATARS = [
+  "https://i.pravatar.cc/120?img=47",
+  "https://i.pravatar.cc/120?img=12",
+  "https://i.pravatar.cc/120?img=32",
+  "https://i.pravatar.cc/120?img=68",
 ];
-
-type Review = (typeof REVIEWS)[number];
 
 function Star({ size = 16 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="#7CB518">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#F5A524">
       <path d="M12 2l2.9 6.9L22 9.7l-5.5 4.7L18 22l-6-3.5L6 22l1.5-7.6L2 9.7l7.1-.8L12 2z" />
     </svg>
   );
 }
 
-function ReviewCard({ review }: { review: Review }) {
+export function TestimonialsSection() {
   return (
-    <div
-      className="flex w-[280px] shrink-0 flex-col gap-4 rounded-[20px] bg-white p-5"
-      style={{ boxShadow: "0 20px 50px -20px rgba(0,0,0,0.35)" }}
+    <section
+      className="w-full py-20 lg:py-28"
+      style={{ backgroundColor: "var(--bg-primary)" }}
     >
-      <div className="flex gap-0.5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} size={18} />
-        ))}
-      </div>
-      <p className="text-sm leading-relaxed text-[#161616]">{review.text}</p>
-      <div className="mt-auto flex items-center gap-3 pt-2">
-        <Image
-          src={review.avatar}
-          alt={review.author}
-          width={32}
-          height={32}
-          className="h-8 w-8 rounded-full"
-        />
-        <div>
-          <p className="text-sm font-medium text-[#161616]">{review.author}</p>
-          <p className="text-xs text-[#666]">{review.time}</p>
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <span
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em]"
+            style={{
+              backgroundColor: "var(--card-bg-subtle)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            <Star size={12} />
+            Testimonios
+          </span>
+
+          <h2
+            className="display-heading text-[clamp(2.5rem,6vw,4.5rem)]"
+            style={{ lineHeight: 1.05 }}
+          >
+            Reseñas de nuestros Rialuos
+          </h2>
+
+          <div className="mt-2 flex items-center gap-5">
+            <div className="flex -space-x-3">
+              {AVATARS.map((src) => (
+                <Image
+                  key={src}
+                  src={src}
+                  alt=""
+                  width={44}
+                  height={44}
+                  className="h-11 w-11 rounded-full border-2 object-cover"
+                  style={{ borderColor: "var(--bg-primary)" }}
+                />
+              ))}
+            </div>
+            <div className="flex flex-col items-start">
+              <div className="flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} size={18} />
+                ))}
+              </div>
+              <p
+                className="text-sm"
+                style={{ color: "var(--text-muted)" }}
+              >
+                +35.000 reseñas
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-16 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.8fr]">
+          <StatCard />
+          <FeaturedReview />
         </div>
       </div>
+    </section>
+  );
+}
+
+function StatCard() {
+  return (
+    <div
+      className="flex h-full flex-col justify-between rounded-[32px] p-8 lg:p-10"
+      style={{
+        backgroundColor: "var(--accent)",
+        color: "var(--accent-foreground)",
+        minHeight: 360,
+      }}
+    >
+      <div>
+        <p
+          className="font-[family-name:var(--font-sora)] text-[clamp(4rem,9vw,7rem)] font-extrabold leading-none"
+        >
+          +70k
+        </p>
+        <p className="mt-6 max-w-xs text-lg leading-snug lg:text-xl">
+          Personas registrando sus finanzas cada semana en Rial.
+        </p>
+      </div>
+      <p className="mt-10 text-sm font-semibold">
+        Usuarios activos en la app
+      </p>
     </div>
   );
 }
 
-export function TestimonialsSection() {
+function FeaturedReview() {
   return (
-    <section className="w-full py-12 lg:py-16" style={{ backgroundColor: "var(--bg-primary)" }}>
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="relative h-[680px] overflow-hidden rounded-[32px] lg:h-[820px]">
-          <Image
-            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1800"
-            alt="Persona usando Rial"
-            fill
-            sizes="(min-width: 1280px) 1280px, 100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/20 to-transparent" />
-
-          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-5 p-8 lg:max-w-[55%] lg:p-12">
-            <h2 className="font-[family-name:var(--font-sora)] text-[clamp(2.25rem,5.5vw,4.5rem)] font-[800] leading-[1.05] text-white">
-              Lo que dice<br />nuestra gente
-            </h2>
-            <p className="max-w-sm text-sm text-white/85 lg:text-base">
-              Miles de venezolanos confían en Rial para organizar sus finanzas día a día.
-            </p>
-            <div className="flex items-center gap-3 pt-1">
-              <div className="flex items-center gap-2">
-                <Star size={18} />
-                <span className="text-sm font-semibold text-white">Excelente</span>
-              </div>
-              <span className="text-xs text-white/70">Basado en 2.847 reseñas</span>
-            </div>
-          </div>
-
-          <div
-            className="absolute bottom-12 right-0 hidden lg:block"
-            style={{ left: "48%" }}
-          >
-            <div
-              className="flex gap-5 overflow-x-auto pb-4 pr-12"
-              style={{ scrollbarWidth: "none" }}
-            >
-              {REVIEWS.map((r) => (
-                <ReviewCard key={r.author} review={r} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="mt-6 flex gap-4 overflow-x-auto pb-2 lg:hidden"
-          style={{ scrollbarWidth: "none" }}
-        >
-          {REVIEWS.map((r) => (
-            <ReviewCard key={r.author} review={r} />
-          ))}
-        </div>
+    <div
+      className="flex h-full flex-col rounded-[32px] p-8 lg:p-10"
+      style={{
+        backgroundColor: "var(--card-bg-subtle)",
+        minHeight: 360,
+      }}
+    >
+      <div className="flex gap-1">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star key={i} size={20} />
+        ))}
       </div>
-    </section>
+
+      <h3
+        className="mt-6 font-[family-name:var(--font-sora)] text-2xl font-extrabold leading-snug lg:text-3xl"
+        style={{ color: "var(--text-primary)" }}
+      >
+        Rial es la forma más simple de ver todo mi dinero en un solo lugar.
+      </h3>
+
+      <p
+        className="mt-5 text-base lg:text-lg"
+        style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
+      >
+        Antes tenía un Excel para los bolívares y otra app para los dólares. Con Rial veo el balance total, mis metas y los gastos del mes sin saltar entre pantallas. Es lo más parecido a tener un asistente financiero personal.
+      </p>
+
+      <div className="mt-auto flex items-end justify-between pt-8">
+        <div className="flex items-center gap-3">
+          <Image
+            src="https://i.pravatar.cc/120?img=32"
+            alt="Andrea Méndez"
+            width={48}
+            height={48}
+            className="h-12 w-12 rounded-full object-cover"
+          />
+          <div>
+            <p
+              className="font-[family-name:var(--font-sora)] font-bold"
+              style={{ color: "var(--text-primary)" }}
+            >
+              Andrea Méndez
+            </p>
+            <p
+              className="text-sm"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Diseñadora · Caracas
+            </p>
+          </div>
+        </div>
+        <p
+          className="text-sm"
+          style={{ color: "var(--text-muted)" }}
+        >
+          12 mar, 2026
+        </p>
+      </div>
+    </div>
   );
 }
