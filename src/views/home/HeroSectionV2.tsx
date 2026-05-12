@@ -48,26 +48,34 @@ export function HeroSectionV2() {
         }}
       />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 pt-8 pb-24 lg:grid-cols-[1.3fr_1.5fr_0.7fr] lg:gap-10 lg:pt-12 lg:pb-32">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 pt-28 pb-10 lg:grid-cols-[1.3fr_1.5fr_0.7fr] lg:items-start lg:gap-10 lg:pt-32 lg:pb-12">
         {/* Left: heading + CTA */}
-        <div className="flex flex-col gap-12">
-          <h2 className="display-heading text-[clamp(2.75rem,7vw,5rem)]">
-            <span className="block">Empieza a</span>
-            <span className="block">gestionar</span>
-            <span className="block">tu dinero</span>
-            <span className="mt-3 flex items-center gap-5">
-              <span
-                aria-hidden="true"
-                className="hidden h-px w-16 shrink-0 sm:block lg:w-24"
-                style={{ backgroundColor: "var(--text-muted)" }}
-              />
-              <span
-                className="text-[clamp(2rem,5vw,3.75rem)]"
-                style={{ color: "var(--text-muted)", fontWeight: 600 }}
-              >
-                con Rial
-              </span>
-            </span>
+        <div className="flex flex-col gap-8 lg:mt-16">
+          <div
+            className="flex items-center gap-3 text-sm lg:text-base"
+            style={{ color: "var(--text-primary)" }}
+          >
+            <span>Acelerados por</span>
+            <Image
+              src="/logos/innoven-black.svg"
+              alt="innoven"
+              width={88}
+              height={20}
+              className="block h-5 w-auto dark:hidden"
+            />
+            <Image
+              src="/logos/innoven-white.svg"
+              alt="innoven"
+              width={88}
+              height={20}
+              className="hidden h-5 w-auto dark:block"
+            />
+          </div>
+
+          <h2 className="display-heading text-[clamp(2rem,5vw,3.75rem)]">
+            <span className="block">Tus riales.</span>
+            <span className="block">Tu control.</span>
+            <span className="block">Una sola app.</span>
           </h2>
 
           <div>
@@ -109,7 +117,7 @@ export function HeroSectionV2() {
 
         {/* Middle: device mockup */}
         <div
-          className="relative order-last flex h-[460px] items-center justify-center sm:h-[580px] lg:order-none lg:h-[900px] lg:translate-y-[18%]"
+          className="relative order-last flex h-[460px] items-center justify-center sm:h-[580px] lg:order-none lg:h-[720px] lg:translate-y-[2%]"
           style={{ perspective: "1500px", zIndex: 30 }}
         >
           {/* Float wrapper — idle bobbing */}
@@ -128,14 +136,25 @@ export function HeroSectionV2() {
               }}
             >
               <Image
-                src="/iPhone 15.png"
+                src="/iphone light.png"
                 alt="App Rial en iPhone"
                 fill
                 priority
                 sizes="(max-width: 1024px) 90vw, 45vw"
-                className="object-contain"
+                className="block object-contain dark:hidden"
                 style={{
                   filter: "drop-shadow(0 40px 60px rgba(0, 0, 0, 0.25))",
+                }}
+              />
+              <Image
+                src="/iphone dark.png"
+                alt="App Rial en iPhone"
+                fill
+                priority
+                sizes="(max-width: 1024px) 90vw, 45vw"
+                className="hidden object-contain dark:block"
+                style={{
+                  filter: "drop-shadow(0 40px 60px rgba(0, 0, 0, 0.45))",
                 }}
               />
             </div>

@@ -14,7 +14,7 @@ export function BrandsBanner() {
     >
       <div className="mx-auto max-w-7xl px-6">
         <div
-          className="relative overflow-hidden rounded-[40px] pt-48 pb-12 lg:pt-80 lg:pb-14"
+          className="relative overflow-hidden rounded-[40px] pt-44 pb-12 lg:pt-72 lg:pb-14"
           style={{ backgroundColor: "var(--accent)" }}
         >
           {/* Watermark + separator — animated marquee, faded edges */}
@@ -39,7 +39,7 @@ export function BrandsBanner() {
                     letterSpacing: "-0.03em",
                   }}
                 >
-                  GESTIONA · TU DINERO · CON RIAL ·
+                  GESTIONA TUS RIALES ·
                 </p>
                 <p
                   className="shrink-0 pr-[0.3em] font-[family-name:var(--font-sora)] text-[9vw] font-extrabold uppercase leading-none"
@@ -48,14 +48,14 @@ export function BrandsBanner() {
                     letterSpacing: "-0.03em",
                   }}
                 >
-                  GESTIONA · TU DINERO · CON RIAL ·
+                  GESTIONA TUS RIALES ·
                 </p>
               </div>
             </div>
 
             {/* Separator — sits right below the marquee */}
             <div
-              className="mx-auto mt-12 h-px w-3/4 max-w-3xl lg:mt-16"
+              className="mx-auto mt-3 h-px w-3/4 max-w-3xl lg:mt-4"
               style={{
                 backgroundColor: "rgba(22, 22, 22, 0.18)",
                 maskImage:
