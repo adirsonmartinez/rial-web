@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Calculator,
@@ -39,8 +42,34 @@ const FEATURES_BOTTOM = [
 ];
 
 export function FeaturesSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [phoneOffset, setPhoneOffset] = useState(0);
+
+  useEffect(() => {
+    const update = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const viewportH = window.innerHeight;
+      // Section progress: 0 = bottom just entered viewport, 1 = top just left
+      const progress = (viewportH - rect.top) / (viewportH + rect.height);
+      const clamped = Math.max(0, Math.min(1, progress));
+      // Move phone from +180px (down, below wrapper) to 0 (top aligned) — never negative to avoid top cut
+      setPhoneOffset((1 - clamped) * 180);
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="funciones"
       className="relative w-full overflow-hidden py-20 lg:py-28"
       style={{ backgroundColor: "var(--bg-primary)" }}
@@ -56,7 +85,7 @@ export function FeaturesSection() {
           fontSize: "clamp(7rem, 18vw, 16rem)",
           lineHeight: 1,
           letterSpacing: "-0.04em",
-          transform: "translateY(-30%)",
+          transform: "translateY(-65%)",
         }}
       >
         FUNCIONES
@@ -85,29 +114,29 @@ export function FeaturesSection() {
           </div>
         </div>
 
-        {/* Phone mockup — half visible with fade at bottom */}
-        <div className="relative mx-auto mt-16 h-[280px] w-full max-w-[560px] overflow-hidden sm:h-[380px] sm:max-w-[640px] lg:h-[480px] lg:max-w-[760px]">
-          <div
-            className="absolute inset-x-0 top-0 h-[200%]"
+        {/* Phone mockup — top fully visible, bottom fades */}
+        <div
+          className="relative mx-auto mt-4 w-full max-w-[260px] sm:max-w-[320px] lg:mt-2 lg:max-w-[380px]"
+          style={{
+            transform: `translate3d(0, ${phoneOffset}px, 0)`,
+            willChange: "transform",
+            transition: "transform 100ms linear",
+          }}
+        >
+          <Image
+            src="/2.png"
+            alt="App Rial"
+            width={866}
+            height={2058}
+            sizes="(max-width: 640px) 100vw, 620px"
+            className="block h-auto w-full"
             style={{
               maskImage:
-                "linear-gradient(to bottom, black 0%, black 60%, transparent 95%)",
+                "linear-gradient(to bottom, black 0%, black 25%, transparent 65%)",
               WebkitMaskImage:
-                "linear-gradient(to bottom, black 0%, black 60%, transparent 95%)",
+                "linear-gradient(to bottom, black 0%, black 25%, transparent 65%)",
             }}
-          >
-            <Image
-              src="/2.png"
-              alt="App Rial"
-              fill
-              sizes="(max-width: 640px) 100vw, 760px"
-              className="object-contain"
-              style={{
-                objectPosition: "top",
-                filter: "drop-shadow(0 30px 60px rgba(0, 0, 0, 0.22))",
-              }}
-            />
-          </div>
+          />
         </div>
       </div>
     </section>

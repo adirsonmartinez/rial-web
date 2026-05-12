@@ -17,7 +17,7 @@ export function StatsSection() {
   ];
 
   return (
-    <section className="w-full py-20 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
+    <section className="relative w-full -mt-40 py-20 lg:-mt-60 lg:py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div className="mx-auto max-w-4xl px-6">
         {/* Header — centered */}
         <div className="flex flex-col items-center text-center gap-5 mb-16">
