@@ -226,7 +226,11 @@ export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
                   openSettings("perfil");
                   break;
                 case "mejorar":
-                  router.push("/app/plan");
+                  if (isPlus) {
+                    openSettings("suscripcion");
+                  } else {
+                    router.push("/app/plan");
+                  }
                   break;
                 case "idioma":
                 case "ayuda":
@@ -313,6 +317,7 @@ export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
         }
         initialSection={settings.section}
         subscription={subscription}
+        userEmail={userEmail}
       />
     </aside>
   );

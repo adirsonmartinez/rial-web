@@ -3,17 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button, Chip, Tabs } from "@heroui/react";
-import {
-  ArrowLeft,
-  Check,
-  Sparkles,
-  CrownDiamond,
-} from "@gravity-ui/icons";
+import { ArrowLeft, Check } from "@gravity-ui/icons";
 import type { BillingCycle, SubscriptionInfo } from "@/lib/subscription";
 
-type Cadence = "mensual" | "trimestral" | "semestral" | "anual";
+export type Cadence = "mensual" | "trimestral" | "semestral" | "anual";
 
-const billingCycleToCadence: Record<BillingCycle, Cadence> = {
+export const billingCycleToCadence: Record<BillingCycle, Cadence> = {
   monthly: "mensual",
   quarterly: "trimestral",
   semiannual: "semestral",
@@ -26,14 +21,14 @@ const periodEndFormatter = new Intl.DateTimeFormat("es-VE", {
   year: "numeric",
 });
 
-function formatPeriodEnd(iso: string | null): string | null {
+export function formatPeriodEnd(iso: string | null): string | null {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
   return periodEndFormatter.format(date);
 }
 
-type CadenceInfo = {
+export type CadenceInfo = {
   id: Cadence;
   tabLabel: string;
   monthlyEquivalent: string;
@@ -43,13 +38,13 @@ type CadenceInfo = {
   available: boolean;
 };
 
-const cadences: CadenceInfo[] = [
+export const cadences: CadenceInfo[] = [
   {
     id: "mensual",
     tabLabel: "Mensual",
     monthlyEquivalent: "$4,99",
     totalPrice: "$4,99",
-    helper: "USD / mes · facturado mensualmente",
+    helper: "/mes · facturado mensualmente",
     available: true,
   },
   {
@@ -57,7 +52,7 @@ const cadences: CadenceInfo[] = [
     tabLabel: "Trimestral",
     monthlyEquivalent: "$4,50",
     totalPrice: "$13,49",
-    helper: "USD / mes · facturado trimestralmente ($13,49)",
+    helper: "/mes · $13,49 cada 3 meses",
     discountPct: 10,
     available: false,
   },
@@ -66,7 +61,7 @@ const cadences: CadenceInfo[] = [
     tabLabel: "Semestral",
     monthlyEquivalent: "$4,00",
     totalPrice: "$23,99",
-    helper: "USD / mes · facturado semestralmente ($23,99)",
+    helper: "/mes · $23,99 cada 6 meses",
     discountPct: 20,
     available: false,
   },
@@ -75,17 +70,15 @@ const cadences: CadenceInfo[] = [
     tabLabel: "Anual",
     monthlyEquivalent: "$3,50",
     totalPrice: "$41,99",
-    helper: "USD / mes · facturado anualmente ($41,99)",
+    helper: "/mes · $41,99 al año",
     discountPct: 30,
     available: false,
   },
 ];
 
 const freePlan = {
-  id: "free" as const,
-  name: "Plan Free",
+  chipLabel: "Free",
   tagline: "Para empezar a organizar tus finanzas.",
-  icon: Sparkles,
   features: [
     "Hasta 5 cuentas (3 nacionales + 2 internacionales). Efectivo USD y VES no cuentan",
     "30 transacciones al mes",
@@ -103,10 +96,8 @@ const freePlan = {
 };
 
 const plusPlan = {
-  id: "plus" as const,
-  name: "Plan Plus",
+  chipLabel: "Plus",
   tagline: "Finanzas sin límites.",
-  icon: CrownDiamond,
   ctaLabel: "Elegir Plus",
   featuresIntro: "Todo lo de Free, además:",
   features: [
@@ -119,56 +110,88 @@ const plusPlan = {
   ],
 };
 
-function FreePlanCard({ isCurrent }: { isCurrent: boolean }) {
-  const Icon = freePlan.icon;
+function PlanChip({ label }: { label: string }) {
   return (
-    <article
-      className="relative flex h-full flex-col gap-6 rounded-[30px] p-8"
+    <span
+      className="inline-flex items-center self-start rounded-full px-3 py-1 text-xs font-semibold"
       style={{
         backgroundColor: "var(--bg-card)",
+        color: "var(--text-primary)",
         border: "1px solid var(--border)",
       }}
     >
-      <header className="flex flex-col gap-4">
+      {label}
+    </span>
+  );
+}
+
+function PriceBlock({
+  amount,
+  helper,
+  trailing,
+}: {
+  amount: string;
+  helper: string;
+  trailing?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-start gap-1.5">
         <span
-          className="flex h-10 w-10 items-center justify-center rounded-full"
-          style={{
-            backgroundColor: "var(--accent-soft-bg)",
-            color: "var(--accent-soft-icon)",
-          }}
+          className="display-heading text-5xl leading-none"
+          style={{ color: "var(--text-primary)" }}
         >
-          <Icon width={20} height={20} />
+          {amount}
         </span>
-        <div>
-          <h2
-            className="display-heading text-2xl"
-            style={{ color: "var(--text-primary)" }}
-          >
-            {freePlan.name}
-          </h2>
-          <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
-            {freePlan.tagline}
-          </p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span
-            className="display-heading text-4xl"
-            style={{ color: "var(--text-primary)" }}
-          >
-            $0
-          </span>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-            para siempre
-          </span>
-        </div>
-      </header>
+        <span
+          className="mt-1 text-xs font-semibold"
+          style={{ color: "var(--text-muted)" }}
+        >
+          USD
+        </span>
+        {trailing && <div className="ml-auto self-center">{trailing}</div>}
+      </div>
+      <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+        {helper}
+      </span>
+    </div>
+  );
+}
+
+function FeatureRow({ text }: { text: string }) {
+  return (
+    <li className="flex items-start gap-2">
+      <Check
+        width={16}
+        height={16}
+        style={{ color: "var(--text-primary)", marginTop: 2 }}
+      />
+      <span className="text-sm" style={{ color: "var(--text-primary)" }}>
+        {text}
+      </span>
+    </li>
+  );
+}
+
+export function FreePlanCard({ isCurrent }: { isCurrent: boolean }) {
+  return (
+    <article
+      className="flex h-full flex-col gap-7 rounded-[30px] p-8"
+      style={{ backgroundColor: "var(--card-bg-subtle)" }}
+    >
+      <PlanChip label={freePlan.chipLabel} />
+      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+        {freePlan.tagline}
+      </p>
+      <PriceBlock amount="$0" helper="/mes" />
 
       {isCurrent ? (
         <div
           className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
           style={{
-            backgroundColor: "var(--accent-soft-bg)",
-            color: "var(--accent-soft-icon)",
+            backgroundColor: "var(--bg-card)",
+            color: "var(--text-primary)",
+            border: "1px solid var(--border)",
           }}
         >
           <Check width={16} height={16} />
@@ -176,7 +199,7 @@ function FreePlanCard({ isCurrent }: { isCurrent: boolean }) {
         </div>
       ) : (
         <div
-          className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
+          className="flex h-11 w-full items-center justify-center rounded-full text-sm font-semibold"
           style={{
             backgroundColor: "transparent",
             color: "var(--text-muted)",
@@ -187,11 +210,6 @@ function FreePlanCard({ isCurrent }: { isCurrent: boolean }) {
         </div>
       )}
 
-      <div
-        className="h-px w-full"
-        style={{ backgroundColor: "var(--border)" }}
-      />
-
       <ul className="flex flex-col gap-3">
         {freePlan.features.map((feature) => (
           <FeatureRow key={feature} text={feature} />
@@ -201,7 +219,7 @@ function FreePlanCard({ isCurrent }: { isCurrent: boolean }) {
   );
 }
 
-function PlusPlanCard({
+export function PlusPlanCard({
   cadence,
   isCurrent,
   periodEndLabel,
@@ -212,151 +230,112 @@ function PlusPlanCard({
   periodEndLabel: string | null;
   cancelAtPeriodEnd: boolean;
 }) {
-  const Icon = plusPlan.icon;
   const checkoutHref = `/app/checkout?cadence=${cadence.id}`;
+  const bannerLabel = isCurrent ? "Tu plan" : "Más popular";
+
+  const trailingChip =
+    cadence.available && cadence.discountPct ? (
+      <Chip color="success" variant="soft" size="sm">
+        Ahorra {cadence.discountPct}%
+      </Chip>
+    ) : !cadence.available ? (
+      <Chip color="warning" variant="soft" size="sm">
+        Próximamente
+      </Chip>
+    ) : null;
+
   return (
-    <article
-      className="relative flex h-full flex-col gap-6 rounded-[30px] p-8"
-      style={{
-        backgroundColor: "var(--bg-card)",
-        border: "2px solid var(--accent)",
-      }}
+    <div
+      className="flex h-full flex-col rounded-[30px]"
+      style={{ backgroundColor: "var(--accent-soft-icon)" }}
     >
-      <span
-        className="absolute -top-3 right-8 rounded-full px-3 py-1 text-xs font-semibold"
+      <div
+        className="py-2.5 text-center text-sm font-semibold"
+        style={{ color: "var(--bg-primary)" }}
+      >
+        {bannerLabel}
+      </div>
+      <article
+        className="flex flex-1 flex-col gap-7 rounded-[28px] p-8"
         style={{
-          backgroundColor: "var(--accent)",
-          color: "var(--accent-foreground)",
+          backgroundColor: "var(--bg-card)",
+          marginInline: "2px",
+          marginBottom: "2px",
         }}
       >
-        {isCurrent ? "Activo" : "Popular"}
-      </span>
+        <PlanChip label={plusPlan.chipLabel} />
+        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          {plusPlan.tagline}
+        </p>
+        <PriceBlock
+          amount={cadence.monthlyEquivalent}
+          helper={cadence.helper}
+          trailing={trailingChip}
+        />
 
-      <header className="flex flex-col gap-4">
-        <span
-          className="flex h-10 w-10 items-center justify-center rounded-full"
-          style={{
-            backgroundColor: "var(--accent-soft-bg)",
-            color: "var(--accent-soft-icon)",
-          }}
-        >
-          <Icon width={20} height={20} />
-        </span>
-        <div>
-          <h2
-            className="display-heading text-2xl"
+        {isCurrent ? (
+          <div className="flex flex-col gap-1.5">
+            <div
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
+              style={{
+                backgroundColor: "var(--accent)",
+                color: "var(--accent-foreground)",
+              }}
+            >
+              <Check width={16} height={16} />
+              <span>Plan actual</span>
+            </div>
+            {periodEndLabel && (
+              <span
+                className="text-center text-xs"
+                style={{ color: "var(--text-muted)" }}
+              >
+                {cancelAtPeriodEnd
+                  ? `Cancela el ${periodEndLabel}`
+                  : `Renueva el ${periodEndLabel}`}
+              </span>
+            )}
+          </div>
+        ) : cadence.available ? (
+          <Button
+            fullWidth
+            className="h-11 rounded-full text-sm font-semibold"
+            style={{
+              backgroundColor: "var(--accent)",
+              color: "var(--accent-foreground)",
+            }}
+            render={(props) => (
+              <Link
+                {...(props as unknown as React.ComponentProps<typeof Link>)}
+                href={checkoutHref}
+              />
+            )}
+          >
+            {plusPlan.ctaLabel}
+          </Button>
+        ) : (
+          <Button
+            fullWidth
+            isDisabled
+            className="h-11 rounded-full text-sm font-semibold"
+          >
+            Próximamente
+          </Button>
+        )}
+
+        <ul className="flex flex-col gap-3">
+          <li
+            className="text-sm font-semibold"
             style={{ color: "var(--text-primary)" }}
           >
-            {plusPlan.name}
-          </h2>
-          <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
-            {plusPlan.tagline}
-          </p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <span
-              className="display-heading text-4xl"
-              style={{ color: "var(--text-primary)" }}
-            >
-              {cadence.monthlyEquivalent}
-            </span>
-            {cadence.available && cadence.discountPct && (
-              <Chip color="success" variant="soft" size="sm">
-                Ahorra {cadence.discountPct}%
-              </Chip>
-            )}
-            {!cadence.available && (
-              <Chip color="warning" variant="soft" size="sm">
-                Próximamente
-              </Chip>
-            )}
-          </div>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-            {cadence.helper}
-          </span>
-        </div>
-      </header>
-
-      {isCurrent ? (
-        <div className="flex flex-col gap-1">
-          <div
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
-            style={{
-              backgroundColor: "var(--accent-soft-bg)",
-              color: "var(--accent-soft-icon)",
-            }}
-          >
-            <Check width={16} height={16} />
-            <span>Plan actual</span>
-          </div>
-          {periodEndLabel && (
-            <span
-              className="text-center text-xs"
-              style={{ color: "var(--text-muted)" }}
-            >
-              {cancelAtPeriodEnd
-                ? `Cancela el ${periodEndLabel}`
-                : `Renueva el ${periodEndLabel}`}
-            </span>
-          )}
-        </div>
-      ) : cadence.available ? (
-        <Button
-          variant="primary"
-          fullWidth
-          className="h-11"
-          render={(props) => (
-            <Link
-              {...(props as unknown as React.ComponentProps<typeof Link>)}
-              href={checkoutHref}
-            />
-          )}
-        >
-          {plusPlan.ctaLabel}
-        </Button>
-      ) : (
-        <Button variant="primary" fullWidth className="h-11" isDisabled>
-          Próximamente
-        </Button>
-      )}
-
-      <div
-        className="h-px w-full"
-        style={{ backgroundColor: "var(--border)" }}
-      />
-
-      <ul className="flex flex-col gap-3">
-        <li
-          className="text-sm font-semibold"
-          style={{ color: "var(--text-primary)" }}
-        >
-          {plusPlan.featuresIntro}
-        </li>
-        {plusPlan.features.map((feature) => (
-          <FeatureRow key={feature} text={feature} />
-        ))}
-      </ul>
-    </article>
-  );
-}
-
-function FeatureRow({ text }: { text: string }) {
-  return (
-    <li className="flex items-start gap-2">
-      <span
-        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
-        style={{
-          backgroundColor: "var(--accent-soft-bg)",
-          color: "var(--accent-soft-icon)",
-        }}
-      >
-        <Check width={12} height={12} />
-      </span>
-      <span className="text-sm" style={{ color: "var(--text-primary)" }}>
-        {text}
-      </span>
-    </li>
+            {plusPlan.featuresIntro}
+          </li>
+          {plusPlan.features.map((feature) => (
+            <FeatureRow key={feature} text={feature} />
+          ))}
+        </ul>
+      </article>
+    </div>
   );
 }
 
@@ -370,11 +349,11 @@ export function PlanView({
     isPlus && subscription.billingCycle
       ? billingCycleToCadence[subscription.billingCycle]
       : null;
-  const defaultCadence: Cadence = currentCadence ?? "trimestral";
+  const defaultCadence: Cadence = currentCadence ?? "mensual";
 
   const [cadenceId, setCadenceId] = useState<Cadence>(defaultCadence);
   const cadence =
-    cadences.find((c) => c.id === cadenceId) ?? cadences[1];
+    cadences.find((c) => c.id === cadenceId) ?? cadences[0];
 
   const isCurrentPlusCard = isPlus && cadence.id === currentCadence;
   const periodEndLabel = formatPeriodEnd(subscription.currentPeriodEnd);
@@ -415,7 +394,7 @@ export function PlanView({
         </Tabs>
       </header>
 
-      <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 items-stretch gap-6 md:grid-cols-2">
         <FreePlanCard isCurrent={!isPlus} />
         <PlusPlanCard
           cadence={cadence}
