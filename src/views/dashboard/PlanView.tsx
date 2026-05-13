@@ -9,8 +9,29 @@ import {
   Sparkles,
   CrownDiamond,
 } from "@gravity-ui/icons";
+import type { BillingCycle, SubscriptionInfo } from "@/lib/subscription";
 
 type Cadence = "mensual" | "trimestral" | "semestral" | "anual";
+
+const billingCycleToCadence: Record<BillingCycle, Cadence> = {
+  monthly: "mensual",
+  quarterly: "trimestral",
+  semiannual: "semestral",
+  yearly: "anual",
+};
+
+const periodEndFormatter = new Intl.DateTimeFormat("es-VE", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+function formatPeriodEnd(iso: string | null): string | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return periodEndFormatter.format(date);
+}
 
 type CadenceInfo = {
   id: Cadence;
@@ -65,9 +86,6 @@ const freePlan = {
   name: "Plan Free",
   tagline: "Para empezar a organizar tus finanzas.",
   icon: Sparkles,
-  ctaLabel: "Plan actual",
-  isCurrent: true,
-  isHighlighted: false,
   features: [
     "Hasta 5 cuentas (3 nacionales + 2 internacionales). Efectivo USD y VES no cuentan",
     "30 transacciones al mes",
@@ -90,8 +108,6 @@ const plusPlan = {
   tagline: "Finanzas sin límites.",
   icon: CrownDiamond,
   ctaLabel: "Elegir Plus",
-  isCurrent: false,
-  isHighlighted: true,
   featuresIntro: "Todo lo de Free, además:",
   features: [
     "Cuentas ilimitadas",
@@ -103,7 +119,7 @@ const plusPlan = {
   ],
 };
 
-function FreePlanCard() {
+function FreePlanCard({ isCurrent }: { isCurrent: boolean }) {
   const Icon = freePlan.icon;
   return (
     <article
@@ -147,16 +163,29 @@ function FreePlanCard() {
         </div>
       </header>
 
-      <div
-        className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
-        style={{
-          backgroundColor: "var(--accent-soft-bg)",
-          color: "var(--accent-soft-icon)",
-        }}
-      >
-        <Check width={16} height={16} />
-        <span>{freePlan.ctaLabel}</span>
-      </div>
+      {isCurrent ? (
+        <div
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
+          style={{
+            backgroundColor: "var(--accent-soft-bg)",
+            color: "var(--accent-soft-icon)",
+          }}
+        >
+          <Check width={16} height={16} />
+          <span>Plan actual</span>
+        </div>
+      ) : (
+        <div
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
+          style={{
+            backgroundColor: "transparent",
+            color: "var(--text-muted)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          <span>Plan gratuito</span>
+        </div>
+      )}
 
       <div
         className="h-px w-full"
@@ -172,7 +201,17 @@ function FreePlanCard() {
   );
 }
 
-function PlusPlanCard({ cadence }: { cadence: CadenceInfo }) {
+function PlusPlanCard({
+  cadence,
+  isCurrent,
+  periodEndLabel,
+  cancelAtPeriodEnd,
+}: {
+  cadence: CadenceInfo;
+  isCurrent: boolean;
+  periodEndLabel: string | null;
+  cancelAtPeriodEnd: boolean;
+}) {
   const Icon = plusPlan.icon;
   const checkoutHref = `/app/checkout?cadence=${cadence.id}`;
   return (
@@ -190,7 +229,7 @@ function PlusPlanCard({ cadence }: { cadence: CadenceInfo }) {
           color: "var(--accent-foreground)",
         }}
       >
-        Popular
+        {isCurrent ? "Activo" : "Popular"}
       </span>
 
       <header className="flex flex-col gap-4">
@@ -239,7 +278,30 @@ function PlusPlanCard({ cadence }: { cadence: CadenceInfo }) {
         </div>
       </header>
 
-      {cadence.available ? (
+      {isCurrent ? (
+        <div className="flex flex-col gap-1">
+          <div
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold"
+            style={{
+              backgroundColor: "var(--accent-soft-bg)",
+              color: "var(--accent-soft-icon)",
+            }}
+          >
+            <Check width={16} height={16} />
+            <span>Plan actual</span>
+          </div>
+          {periodEndLabel && (
+            <span
+              className="text-center text-xs"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {cancelAtPeriodEnd
+                ? `Cancela el ${periodEndLabel}`
+                : `Renueva el ${periodEndLabel}`}
+            </span>
+          )}
+        </div>
+      ) : cadence.available ? (
         <Button
           variant="primary"
           fullWidth
@@ -298,10 +360,24 @@ function FeatureRow({ text }: { text: string }) {
   );
 }
 
-export function PlanView() {
-  const [cadenceId, setCadenceId] = useState<Cadence>("trimestral");
+export function PlanView({
+  subscription,
+}: {
+  subscription: SubscriptionInfo;
+}) {
+  const isPlus = subscription.plan === "plus";
+  const currentCadence: Cadence | null =
+    isPlus && subscription.billingCycle
+      ? billingCycleToCadence[subscription.billingCycle]
+      : null;
+  const defaultCadence: Cadence = currentCadence ?? "trimestral";
+
+  const [cadenceId, setCadenceId] = useState<Cadence>(defaultCadence);
   const cadence =
     cadences.find((c) => c.id === cadenceId) ?? cadences[1];
+
+  const isCurrentPlusCard = isPlus && cadence.id === currentCadence;
+  const periodEndLabel = formatPeriodEnd(subscription.currentPeriodEnd);
 
   return (
     <div className="mx-auto w-full max-w-[1100px] px-6 py-8">
@@ -319,7 +395,7 @@ export function PlanView() {
           className="display-heading text-[clamp(2rem,4vw,2.75rem)]"
           style={{ color: "var(--text-primary)" }}
         >
-          Planes que crecen contigo
+          {isPlus ? "Tu plan Rial Plus" : "Planes que crecen contigo"}
         </h1>
 
         <Tabs
@@ -340,8 +416,13 @@ export function PlanView() {
       </header>
 
       <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
-        <FreePlanCard />
-        <PlusPlanCard cadence={cadence} />
+        <FreePlanCard isCurrent={!isPlus} />
+        <PlusPlanCard
+          cadence={cadence}
+          isCurrent={isCurrentPlusCard}
+          periodEndLabel={periodEndLabel}
+          cancelAtPeriodEnd={subscription.cancelAtPeriodEnd}
+        />
       </div>
 
       <p

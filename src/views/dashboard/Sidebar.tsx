@@ -23,6 +23,7 @@ import {
   ArrowRightArrowLeft,
   ArrowsRotateRight,
   Sparkles,
+  CrownDiamond,
   Gear,
   Globe,
   CircleQuestion,
@@ -30,6 +31,7 @@ import {
   ArrowRightFromSquare,
 } from "@gravity-ui/icons";
 import { createClient } from "@/lib/supabase/client";
+import type { SubscriptionInfo } from "@/lib/subscription";
 import { SettingsModal, type SettingsSectionId } from "./SettingsModal";
 
 type NavItem = {
@@ -93,9 +95,11 @@ function NavRow({
 type SidebarProps = {
   userEmail: string;
   userName: string;
+  subscription: SubscriptionInfo;
 };
 
-export function Sidebar({ userEmail, userName }: SidebarProps) {
+export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
+  const isPlus = subscription.plan === "plus";
   const pathname = usePathname();
   const router = useRouter();
   const [comingSoonLabel, setComingSoonLabel] = useState<string | null>(null);
@@ -166,63 +170,39 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
         })}
       </nav>
 
-      <Link
-        href="/app/plan"
-        className="mt-auto mb-3 flex flex-col gap-2 rounded-2xl p-4 no-underline transition-colors hover:opacity-90"
-        style={{
-          backgroundColor: "var(--accent-soft-bg)",
-          border: "1px solid var(--border)",
-        }}
-      >
-        <div className="flex items-center gap-2">
-          <span
-            className="flex h-7 w-7 items-center justify-center rounded-full"
-            style={{
-              backgroundColor: "var(--rial)",
-              color: "var(--text-on-accent)",
-            }}
-          >
-            <Sparkles width={14} height={14} />
-          </span>
-          <span
-            className="text-sm font-semibold"
-            style={{ color: "var(--text-primary)" }}
-          >
-            Rial Plus
-          </span>
-        </div>
-        <p
-          className="text-xs leading-snug"
-          style={{ color: "var(--text-secondary)" }}
-        >
-          Desbloquea cuentas ilimitadas, presupuestos y reportes avanzados.
-        </p>
-        <span
-          className="mt-1 text-xs font-semibold"
-          style={{ color: "var(--accent-soft-icon)" }}
-        >
-          Mejorar plan →
-        </span>
-      </Link>
-
       <Dropdown>
         <Dropdown.Trigger
           aria-label="Menú de usuario"
-          className="flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2 text-left transition-colors hover:bg-[var(--card-bg-hover)]"
+          className="mt-auto flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2 text-left transition-colors hover:bg-[var(--card-bg-hover)]"
         >
-          <Avatar size="md">
-            <Avatar.Fallback>
+          <div className="relative shrink-0">
+            <Avatar size="md">
+              <Avatar.Fallback>
+                <span
+                  className="flex h-full w-full items-center justify-center rounded-full text-sm font-semibold"
+                  style={{
+                    backgroundColor: "var(--accent-soft-bg)",
+                    color: "var(--accent-soft-icon)",
+                  }}
+                >
+                  {initial}
+                </span>
+              </Avatar.Fallback>
+            </Avatar>
+            {isPlus && (
               <span
-                className="flex h-full w-full items-center justify-center rounded-full text-sm font-semibold"
+                aria-label="Plan Plus"
+                className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md px-1.5 py-px text-[9px] font-bold uppercase leading-tight tracking-wide"
                 style={{
-                  backgroundColor: "var(--accent-soft-bg)",
-                  color: "var(--accent-soft-icon)",
+                  backgroundColor: "var(--text-primary)",
+                  color: "var(--bg-primary)",
+                  boxShadow: "0 0 0 2px var(--bg-secondary)",
                 }}
               >
-                {initial}
+                Plus
               </span>
-            </Avatar.Fallback>
-          </Avatar>
+            )}
+          </div>
           <div className="min-w-0 flex-1">
             <p
               className="truncate text-sm font-semibold"
@@ -276,9 +256,12 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
               </Dropdown.Item>
             </Dropdown.Section>
             <Separator />
-            <Dropdown.Item id="mejorar" textValue="Mejorar plan">
-              <CircleArrowUp />
-              <Label>Mejorar plan</Label>
+            <Dropdown.Item
+              id="mejorar"
+              textValue={isPlus ? "Gestionar suscripción" : "Mejorar plan"}
+            >
+              {isPlus ? <CrownDiamond /> : <CircleArrowUp />}
+              <Label>{isPlus ? "Gestionar suscripción" : "Mejorar plan"}</Label>
             </Dropdown.Item>
             <Separator />
             <Dropdown.Item id="logout" textValue="Cerrar sesión">
@@ -329,6 +312,7 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
           setSettings((prev) => ({ ...prev, open }))
         }
         initialSection={settings.section}
+        subscription={subscription}
       />
     </aside>
   );
