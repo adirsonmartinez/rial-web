@@ -318,6 +318,7 @@ export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
         initialSection={settings.section}
         subscription={subscription}
         userEmail={userEmail}
+        userName={userName}
       />
     </aside>
   );

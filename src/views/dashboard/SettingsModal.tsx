@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Button, Modal } from "@heroui/react";
-import { Person, Lock, CrownDiamond } from "@gravity-ui/icons";
+import { Avatar, Button, Modal } from "@heroui/react";
+import { Person, CrownDiamond, Sparkles } from "@gravity-ui/icons";
 import type { SubscriptionInfo } from "@/lib/subscription";
 import { formatPeriodEnd } from "./PlanView";
 
-export type SettingsSectionId = "perfil" | "seguridad" | "suscripcion";
+export type SettingsSectionId = "perfil" | "suscripcion";
 type SectionId = SettingsSectionId;
 
 const SUPPORT_EMAIL = "soporte@somosrial.com";
@@ -20,7 +20,6 @@ type Section = {
 
 const sections: Section[] = [
   { id: "perfil", label: "Perfil", icon: Person },
-  { id: "seguridad", label: "Cuenta y seguridad", icon: Lock },
   { id: "suscripcion", label: "Suscripción", icon: CrownDiamond },
 ];
 
@@ -69,43 +68,238 @@ function SectionNav({
   );
 }
 
-function ProfileSection() {
+function AccountRow({
+  label,
+  value,
+  action,
+}: {
+  label: React.ReactNode;
+  value?: string;
+  action?: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col gap-6">
-      <header>
-        <h3
-          className="text-xl font-bold"
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col">
+        <span
+          className="text-sm font-medium"
           style={{ color: "var(--text-primary)" }}
         >
-          Perfil
-        </h3>
-        <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
-          Tu información personal visible en Rial.
-        </p>
-      </header>
-      <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-        Próximamente vas a poder editar tu nombre, foto y datos de contacto.
-      </p>
+          {label}
+        </span>
+        {value && (
+          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+            {value}
+          </span>
+        )}
+      </div>
+      {action}
     </div>
   );
 }
 
-function CancelSubscriptionModal({
+function OutlineButton({
+  onPress,
+  children,
+}: {
+  onPress: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Button
+      className="shrink-0"
+      style={{
+        backgroundColor: "transparent",
+        color: "var(--text-primary)",
+        border: "1px solid var(--text-primary)",
+      }}
+      onPress={onPress}
+    >
+      {children}
+    </Button>
+  );
+}
+
+function ProfileSection({
+  userName,
+  userEmail,
+  onComingSoon,
+}: {
+  userName: string;
+  userEmail: string;
+  onComingSoon: (label: string) => void;
+}) {
+  const initial = (userName || userEmail || "?")
+    .trim()
+    .charAt(0)
+    .toUpperCase();
+  const username = userEmail.split("@")[0] || userName;
+
+  return (
+    <div className="flex flex-col gap-6">
+      <header className="flex flex-col gap-4">
+        <h3
+          className="text-xl font-bold"
+          style={{ color: "var(--text-primary)" }}
+        >
+          Cuenta
+        </h3>
+        <div
+          className="h-px w-full"
+          style={{ backgroundColor: "var(--border)" }}
+        />
+      </header>
+
+      <div className="flex flex-col gap-6">
+        <AccountRow
+          label={
+            <div className="flex items-center gap-3">
+              <Avatar size="md">
+                <Avatar.Fallback>
+                  <span
+                    className="flex h-full w-full items-center justify-center rounded-full text-sm font-semibold"
+                    style={{
+                      backgroundColor: "var(--accent-soft-bg)",
+                      color: "var(--accent-soft-icon)",
+                    }}
+                  >
+                    {initial}
+                  </span>
+                </Avatar.Fallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  {userName}
+                </span>
+                <span
+                  className="text-sm"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {username}
+                </span>
+              </div>
+            </div>
+          }
+          action={
+            <OutlineButton onPress={() => onComingSoon("Cambiar avatar")}>
+              Cambiar avatar
+            </OutlineButton>
+          }
+        />
+
+        <AccountRow
+          label="Nombre completo"
+          value={userName}
+          action={
+            <OutlineButton
+              onPress={() => onComingSoon("Cambiar nombre completo")}
+            >
+              Cambiar nombre completo
+            </OutlineButton>
+          }
+        />
+
+        <AccountRow
+          label="Usuario"
+          value={username}
+          action={
+            <OutlineButton
+              onPress={() => onComingSoon("Cambiar nombre de usuario")}
+            >
+              Cambiar nombre de usuario
+            </OutlineButton>
+          }
+        />
+
+        <AccountRow label="E-mail" value={userEmail} />
+      </div>
+    </div>
+  );
+}
+
+function ComingSoonModal({
+  label,
+  onClose,
+}: {
+  label: string | null;
+  onClose: () => void;
+}) {
+  return (
+    <Modal.Backdrop
+      isOpen={label !== null}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <Modal.Container>
+        <Modal.Dialog className="sm:max-w-[380px]">
+          <Modal.CloseTrigger />
+          <Modal.Header>
+            <Modal.Icon
+              style={{
+                backgroundColor: "var(--accent-soft-bg)",
+                color: "var(--accent-soft-icon)",
+              }}
+            >
+              <Sparkles className="size-5" />
+            </Modal.Icon>
+            <Modal.Heading>{label}</Modal.Heading>
+          </Modal.Header>
+          <Modal.Body>
+            <p>
+              Esta función está en desarrollo y estará disponible próximamente.
+            </p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button slot="close" className="w-full">
+              Entendido
+            </Button>
+          </Modal.Footer>
+        </Modal.Dialog>
+      </Modal.Container>
+    </Modal.Backdrop>
+  );
+}
+
+type SupportRequestKind = "cancel" | "reactivate";
+
+function SupportRequestModal({
+  kind,
   isOpen,
   onOpenChange,
   userEmail,
+  periodEnd,
 }: {
+  kind: SupportRequestKind;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   userEmail: string;
+  periodEnd: string | null;
 }) {
+  const isCancel = kind === "cancel";
+  const heading = isCancel ? "Cancelar suscripción" : "Reactivar suscripción";
+
+  const description = isCancel
+    ? "Por ahora la cancelación se hace por correo."
+    : periodEnd
+      ? `Tu suscripción está marcada para cancelarse el ${periodEnd}. Si querés mantenerla activa, podemos reactivarla.`
+      : "Tu suscripción está marcada para cancelarse al final del período. Si querés mantenerla activa, podemos reactivarla.";
+
   const mailtoHref = useMemo(() => {
-    const subject = encodeURIComponent("Cancelar suscripción Rial Plus");
+    const subject = encodeURIComponent(
+      isCancel
+        ? "Cancelar suscripción Rial Plus"
+        : "Reactivar suscripción Rial Plus",
+    );
     const body = encodeURIComponent(
-      `Hola,\n\nQuiero cancelar mi suscripción a Rial Plus.\n\nCorreo de la cuenta: ${userEmail}\n\nGracias.`,
+      isCancel
+        ? `Hola,\n\nQuiero cancelar mi suscripción a Rial Plus.\n\nCorreo de la cuenta: ${userEmail}\n\nGracias.`
+        : `Hola,\n\nQuiero reactivar mi suscripción a Rial Plus${periodEnd ? ` (estaba programada para cancelarse el ${periodEnd})` : ""}.\n\nCorreo de la cuenta: ${userEmail}\n\nGracias.`,
     );
     return `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
-  }, [userEmail]);
+  }, [isCancel, userEmail, periodEnd]);
 
   return (
     <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -121,11 +315,11 @@ function CancelSubscriptionModal({
             >
               <CrownDiamond className="size-5" />
             </Modal.Icon>
-            <Modal.Heading>Cancelar suscripción</Modal.Heading>
+            <Modal.Heading>{heading}</Modal.Heading>
           </Modal.Header>
           <Modal.Body>
             <p>
-              Por ahora la cancelación se hace por correo. Escríbenos a{" "}
+              {description} Escríbenos a{" "}
               <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>
                 {SUPPORT_EMAIL}
               </span>{" "}
@@ -171,7 +365,10 @@ function SubscriptionSection({
   userEmail: string;
 }) {
   const isPlus = subscription.plan === "plus";
-  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const isCancelling = isPlus && subscription.cancelAtPeriodEnd;
+  const [supportKind, setSupportKind] = useState<SupportRequestKind | null>(
+    null,
+  );
   const periodEnd = formatPeriodEnd(subscription.currentPeriodEnd);
 
   const title = isPlus
@@ -180,7 +377,7 @@ function SubscriptionSection({
 
   let subtitle: string;
   if (isPlus && subscription.cancelAtPeriodEnd && periodEnd) {
-    subtitle = `Tu plan se cancelará el ${periodEnd}.`;
+    subtitle = `Tu suscripción seguirá activa hasta el ${periodEnd}. Después de esa fecha pasarás al plan Free.`;
   } else if (isPlus && periodEnd) {
     subtitle = `Explora tus nuevas funciones Plus. Renueva el ${periodEnd}.`;
   } else if (isPlus) {
@@ -245,9 +442,11 @@ function SubscriptionSection({
               color: "var(--text-primary)",
               border: "1px solid var(--text-primary)",
             }}
-            onPress={() => setIsCancelOpen(true)}
+            onPress={() =>
+              setSupportKind(isCancelling ? "reactivate" : "cancel")
+            }
           >
-            Cancelar suscripción
+            {isCancelling ? "Solicitar reactivación" : "Cancelar suscripción"}
           </Button>
         ) : (
           <Button
@@ -265,33 +464,15 @@ function SubscriptionSection({
         )}
       </div>
 
-      <CancelSubscriptionModal
-        isOpen={isCancelOpen}
-        onOpenChange={setIsCancelOpen}
+      <SupportRequestModal
+        kind={supportKind ?? "cancel"}
+        isOpen={supportKind !== null}
+        onOpenChange={(open) => {
+          if (!open) setSupportKind(null);
+        }}
         userEmail={userEmail}
+        periodEnd={periodEnd}
       />
-    </div>
-  );
-}
-
-function SecuritySection() {
-  return (
-    <div className="flex flex-col gap-6">
-      <header>
-        <h3
-          className="text-xl font-bold"
-          style={{ color: "var(--text-primary)" }}
-        >
-          Cuenta y seguridad
-        </h3>
-        <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
-          Gestiona tu contraseña y sesiones activas.
-        </p>
-      </header>
-      <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-        Próximamente vas a poder cambiar tu contraseña, revisar sesiones
-        activas y eliminar tu cuenta.
-      </p>
     </div>
   );
 }
@@ -302,6 +483,7 @@ type SettingsModalProps = {
   initialSection?: SectionId;
   subscription: SubscriptionInfo;
   userEmail: string;
+  userName: string;
 };
 
 export function SettingsModal({
@@ -310,8 +492,10 @@ export function SettingsModal({
   initialSection = "perfil",
   subscription,
   userEmail,
+  userName,
 }: SettingsModalProps) {
   const [active, setActive] = useState<SectionId>(initialSection);
+  const [comingSoonLabel, setComingSoonLabel] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) setActive(initialSection);
@@ -325,8 +509,13 @@ export function SettingsModal({
           <div className="flex h-full">
             <SectionNav active={active} onSelect={setActive} />
             <main className="flex-1 overflow-y-auto p-8">
-              {active === "perfil" && <ProfileSection />}
-              {active === "seguridad" && <SecuritySection />}
+              {active === "perfil" && (
+                <ProfileSection
+                  userName={userName}
+                  userEmail={userEmail}
+                  onComingSoon={setComingSoonLabel}
+                />
+              )}
               {active === "suscripcion" && (
                 <SubscriptionSection
                   subscription={subscription}
@@ -335,6 +524,10 @@ export function SettingsModal({
               )}
             </main>
           </div>
+          <ComingSoonModal
+            label={comingSoonLabel}
+            onClose={() => setComingSoonLabel(null)}
+          />
         </Modal.Dialog>
       </Modal.Container>
     </Modal.Backdrop>

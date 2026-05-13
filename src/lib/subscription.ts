@@ -37,10 +37,23 @@ export async function getSubscriptionInfo(
     return FREE_SUBSCRIPTION;
   }
 
+  const currentPeriodEnd = (data.current_period_end as string | null) ?? null;
+  const cancelAtPeriodEnd = Boolean(data.cancel_at_period_end);
+  const periodEndDate = currentPeriodEnd ? new Date(currentPeriodEnd) : null;
+  const isExpired =
+    cancelAtPeriodEnd &&
+    periodEndDate !== null &&
+    !Number.isNaN(periodEndDate.getTime()) &&
+    periodEndDate.getTime() <= Date.now();
+
+  if (isExpired) {
+    return FREE_SUBSCRIPTION;
+  }
+
   return {
     plan: "plus",
     billingCycle: data.billing_cycle as BillingCycle | null,
-    currentPeriodEnd: data.current_period_end as string | null,
-    cancelAtPeriodEnd: Boolean(data.cancel_at_period_end),
+    currentPeriodEnd,
+    cancelAtPeriodEnd,
   };
 }
