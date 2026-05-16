@@ -17,15 +17,16 @@
 
   /* Theme tokens */
   --bg-primary: #ffffff;
-  --bg-secondary: #f7f7f5;
+  --bg-secondary: #ffffff; /* page bg */
   --bg-card: #ffffff;
+  --bg-card-outer: #fafafb;
   --text-primary: #161616;
   --text-secondary: #2D3B44;
   --text-muted: #8E9399;
   --text-on-accent: #161616;
   --border: rgba(22, 22, 22, 0.12);
   --card-bg-subtle: rgba(22, 22, 22, 0.06);
-  --card-bg-hover: rgba(22, 22, 22, 0.08);
+  --card-bg-hover: rgba(22, 22, 22, 0.04);
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(22, 22, 22, 0.08);
   --navbar-bg: rgba(255, 255, 255, 0.8);
@@ -47,13 +48,14 @@
   --bg-primary: #0e0e0e;
   --bg-secondary: #161616;
   --bg-card: #1c1c1c;
+  --bg-card-outer: #141414;
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.4);
   --text-on-accent: #161616;
   --border: rgba(255, 255, 255, 0.1);
   --card-bg-subtle: rgba(255, 255, 255, 0.05);
-  --card-bg-hover: rgba(255, 255, 255, 0.08);
+  --card-bg-hover: rgba(255, 255, 255, 0.04);
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.1);
   --navbar-bg: rgba(14, 14, 14, 0.8);

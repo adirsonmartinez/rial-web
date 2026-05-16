@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import type { SubscriptionInfo } from "@/lib/subscription";
+import { Topbar } from "@/views/shared/Topbar";
 import { Sidebar } from "./Sidebar";
-import { Topbar } from "./Topbar";
 
 type DashboardShellProps = {
   children: React.ReactNode;

@@ -54,13 +54,9 @@ function NavRow({
 type AdminSidebarProps = {
   userEmail: string;
   userName: string;
-  onToggleSidebar: () => void;
 };
 
-export function AdminSidebar({
-  userEmail,
-  userName,
-}: AdminSidebarProps) {
+export function AdminSidebar({ userEmail, userName }: AdminSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 

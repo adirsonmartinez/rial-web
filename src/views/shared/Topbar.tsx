@@ -19,7 +19,9 @@ export function Topbar({ userName, onToggleSidebar }: TopbarProps) {
   const [greeting, setGreeting] = useState("Hola");
 
   useEffect(() => {
-    setGreeting(greetingForHour(new Date().getHours()));
+    void Promise.resolve().then(() => {
+      setGreeting(greetingForHour(new Date().getHours()));
+    });
   }, []);
 
   return (
