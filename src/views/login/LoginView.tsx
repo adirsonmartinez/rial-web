@@ -11,7 +11,7 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
-import { ThemeToggle } from "@/views/shared/ThemeToggle";
+import { ThemeSwitcher } from "@/views/shared/ThemeSwitcher";
 import { useLoginViewModel } from "./useLoginViewModel";
 
 function GoogleIcon() {
@@ -91,7 +91,7 @@ export function LoginView() {
               priority
             />
           </Link>
-          <ThemeToggle />
+          <ThemeSwitcher />
         </div>
       </header>
 

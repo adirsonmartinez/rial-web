@@ -1,16 +1,67 @@
 "use client";
 
 import { QRCodeSVG } from "qrcode.react";
+import { useQrSpotlight } from "./useQrSpotlight";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://somosrial.vercel.app";
 const DOWNLOAD_URL = `${SITE_URL.replace(/\/$/, "")}/descargar`;
 
 export function FloatingQR() {
+  const { isOpen, close } = useQrSpotlight();
+
   return (
+    <>
+      <div
+        aria-hidden={!isOpen}
+        onClick={close}
+        className={`fixed inset-0 z-[60] hidden bg-black/70 backdrop-blur-sm transition-opacity duration-300 md:block ${
+          isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none fixed bottom-[230px] right-[230px] z-[70] hidden flex-col items-end gap-1 transition-all duration-500 md:flex ${
+          isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+        }`}
+      >
+        <p
+          className="font-[family-name:var(--font-caveat)] text-5xl font-bold leading-none"
+          style={{ color: "#ACE524", transform: "rotate(-8deg)" }}
+        >
+          ¡Escanéame!
+        </p>
+        <svg
+          width="120"
+          height="90"
+          viewBox="0 0 120 90"
+          fill="none"
+          className="-mt-1 mr-4"
+          style={{ color: "#ACE524" }}
+        >
+          <path
+            d="M8 8 C 30 30, 50 55, 78 75"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M68 62 L78 75 L62 76"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </svg>
+      </div>
     <aside
       aria-label="Descargar Rial"
-      className="fixed bottom-5 right-5 z-40 hidden flex-col items-center gap-3 rounded-2xl p-4 backdrop-blur-md md:flex"
+      className={`fixed bottom-5 right-5 z-[70] hidden flex-col items-center gap-3 rounded-2xl p-4 backdrop-blur-md transition-transform duration-300 md:flex ${
+        isOpen ? "scale-110" : ""
+      }`}
       style={{
         backgroundColor: "var(--bg-card)",
         border: "1px solid var(--border)",
@@ -50,6 +101,7 @@ export function FloatingQR() {
         </div>
       </div>
     </aside>
+    </>
   );
 }
 

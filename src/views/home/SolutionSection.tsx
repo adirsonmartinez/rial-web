@@ -8,6 +8,7 @@ import {
   Sparkles,
   TargetDart,
 } from "@gravity-ui/icons";
+import { useQrSpotlight } from "@/views/shared/useQrSpotlight";
 
 type FloatingPill = {
   icon: React.ComponentType<{ width?: number; height?: number }>;
@@ -57,7 +58,15 @@ const FLOATING_PILLS: FloatingPill[] = [
 ];
 
 export function SolutionSection() {
+  const { open: openQrSpotlight } = useQrSpotlight();
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
+
+  const handleDownloadClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (window.matchMedia("(min-width: 768px)").matches) {
+      e.preventDefault();
+      openQrSpotlight();
+    }
+  };
 
   const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -150,7 +159,8 @@ export function SolutionSection() {
         </div>
 
         <Link
-          href="#descargar"
+          href="/descargar"
+          onClick={handleDownloadClick}
           className="group mt-10 inline-flex items-center gap-2 rounded-full p-1.5 pl-7 transition-colors"
           style={{ backgroundColor: "var(--accent-soft-bg)" }}
         >

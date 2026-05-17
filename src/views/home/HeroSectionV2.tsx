@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, type MouseEvent } from "react";
 import { useUserCount, formatMilestone } from "@/views/shared/useUserCount";
+import { useQrSpotlight } from "@/views/shared/useQrSpotlight";
 
 const STAT_AVATARS = [
   "https://api.dicebear.com/9.x/notionists/svg?seed=Valentina&backgroundColor=ACE524",
@@ -13,7 +14,15 @@ const STAT_AVATARS = [
 
 export function HeroSectionV2() {
   const count = useUserCount();
+  const { open: openQrSpotlight } = useQrSpotlight();
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleDownloadClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (window.matchMedia("(min-width: 768px)").matches) {
+      e.preventDefault();
+      openQrSpotlight();
+    }
+  };
 
   const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -80,7 +89,8 @@ export function HeroSectionV2() {
 
           <div>
             <Link
-              href="#descargar"
+              href="/descargar"
+              onClick={handleDownloadClick}
               className="group inline-flex items-center gap-2 rounded-full p-1.5 pl-7 transition-colors"
               style={{ backgroundColor: "var(--accent-soft-bg)" }}
             >
