@@ -77,15 +77,15 @@ export function FeaturesSection() {
       {/* Watermark text */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-1/2 -z-0 select-none text-center opacity-15 dark:opacity-10"
+        className="pointer-events-none absolute inset-x-0 top-[65%] -z-0 select-none text-center opacity-15 dark:opacity-10 lg:top-1/2 lg:[--funciones-y:-65%]"
         style={{
           color: "var(--accent-soft-icon)",
           fontFamily: "var(--font-sora), sans-serif",
           fontWeight: 800,
-          fontSize: "clamp(7rem, 18vw, 16rem)",
+          fontSize: "clamp(4.5rem, 16vw, 16rem)",
           lineHeight: 1,
           letterSpacing: "-0.04em",
-          transform: "translateY(-65%)",
+          transform: "translateY(var(--funciones-y, -50%))",
         }}
       >
         FUNCIONES
@@ -93,7 +93,7 @@ export function FeaturesSection() {
 
       <div className="relative z-10 mx-auto max-w-6xl px-6">
         <h2
-          className="display-heading text-center text-[clamp(2rem,5vw,3.75rem)]"
+          className="display-heading text-center text-[clamp(2rem,4vw,3rem)]"
           style={{ lineHeight: 1.1 }}
         >
           <span className="block">Hecho para llevar</span>

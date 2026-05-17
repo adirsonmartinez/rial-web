@@ -21,7 +21,7 @@ export function StatsSection() {
       <div className="mx-auto max-w-4xl px-6">
         {/* Header — centered */}
         <div className="flex flex-col items-center text-center gap-5 mb-16">
-          <h2 className="display-heading text-[clamp(2rem,4vw,3.5rem)]">
+          <h2 className="display-heading text-[clamp(2rem,4vw,3rem)]">
             Datos y cifras
           </h2>
           <p className="max-w-xl text-base lg:text-lg" style={{ lineHeight: 1.6, color: "var(--text-secondary)" }}>
@@ -50,12 +50,15 @@ export function StatsSection() {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4">
           {stats.map((stat, i) => (
             <div
               key={stat.label}
-              className="flex flex-col items-center gap-3 py-8 lg:py-0"
-              style={i > 0 ? { borderLeft: "1px solid var(--border)" } : undefined}
+              className={`relative flex flex-col items-center gap-3 py-8 lg:py-0 ${
+                i > 0
+                  ? "before:absolute before:left-1/2 before:top-0 before:h-px before:w-12 before:-translate-x-1/2 before:bg-[color:var(--border)] before:content-[''] lg:before:left-0 lg:before:top-1/2 lg:before:h-12 lg:before:w-px lg:before:-translate-x-0 lg:before:-translate-y-1/2"
+                  : ""
+              }`}
             >
               <span
                 className="font-[family-name:var(--font-sora)] text-4xl font-[800] lg:text-5xl"

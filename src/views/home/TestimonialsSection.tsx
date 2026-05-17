@@ -38,7 +38,7 @@ export function TestimonialsSection() {
           </span>
 
           <h2
-            className="display-heading text-[clamp(2.5rem,6vw,4.5rem)]"
+            className="display-heading text-[clamp(2rem,4vw,3rem)]"
             style={{ lineHeight: 1.05 }}
           >
             Reseñas de nuestros Rialuos
@@ -87,24 +87,23 @@ function StatCard() {
   const count = useUserCount();
   return (
     <div
-      className="flex h-full flex-col justify-between rounded-[32px] p-8 lg:p-10"
+      className="flex h-full min-h-[220px] flex-col justify-between rounded-[32px] p-6 lg:min-h-[360px] lg:p-10"
       style={{
         backgroundColor: "var(--accent)",
         color: "var(--accent-foreground)",
-        minHeight: 360,
       }}
     >
       <div>
         <p
-          className="font-[family-name:var(--font-sora)] text-[clamp(4rem,9vw,7rem)] font-extrabold leading-none"
+          className="font-[family-name:var(--font-sora)] text-[clamp(3rem,9vw,7rem)] font-extrabold leading-none"
         >
           {formatMilestone(count)}
         </p>
-        <p className="mt-6 max-w-xs text-lg leading-snug lg:text-xl">
+        <p className="mt-4 max-w-xs text-base leading-snug lg:mt-6 lg:text-xl">
           Personas registrando sus finanzas en Rial.
         </p>
       </div>
-      <p className="mt-10 text-sm font-semibold">
+      <p className="mt-6 text-sm font-semibold lg:mt-10">
         Usuarios activos en la app
       </p>
     </div>

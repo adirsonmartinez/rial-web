@@ -80,7 +80,7 @@ export function SolutionSection() {
       id="solucion"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative w-full overflow-hidden py-24 lg:py-32"
+      className="relative w-full overflow-hidden py-14 lg:py-32"
       style={{ backgroundColor: "var(--bg-primary)" }}
     >
       {/* Subtle grid backdrop */}
@@ -131,13 +131,13 @@ export function SolutionSection() {
       {/* Center content */}
       <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-6 text-center">
         <h2
-          className="display-heading text-[clamp(2rem,5vw,3.75rem)]"
+          className="display-heading text-[clamp(2rem,4vw,3rem)]"
           style={{ lineHeight: 1.1 }}
         >
           Nuestra app es la solución todo en uno para gestionar tu dinero y tus metas financieras.
         </h2>
 
-        <div className="mt-12 flex w-full items-center justify-center gap-4 lg:gap-6">
+        <div className="mt-8 flex w-full items-center justify-center gap-4 lg:mt-12 lg:gap-6">
           <span
             aria-hidden="true"
             className="h-px w-10 shrink-0 lg:w-16"
@@ -159,7 +159,7 @@ export function SolutionSection() {
         <Link
           href="/descargar"
           onClick={handleDownloadClick}
-          className="group mt-10 inline-flex items-center gap-2 rounded-full p-1.5 pl-7 transition-colors"
+          className="group mt-8 inline-flex items-center gap-2 rounded-full p-1.5 pl-7 transition-colors lg:mt-10"
           style={{ backgroundColor: "var(--accent-soft-bg)" }}
         >
           <span

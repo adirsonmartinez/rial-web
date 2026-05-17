@@ -55,11 +55,11 @@ export function HeroSectionV2() {
         }}
       />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 pt-28 pb-10 lg:grid-cols-[1.3fr_1.5fr_0.7fr] lg:items-start lg:gap-10 lg:pt-32 lg:pb-12">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 pt-40 pb-10 lg:grid-cols-[1.3fr_1.5fr_0.7fr] lg:items-start lg:gap-10 lg:pt-32 lg:pb-12">
         {/* Left: heading + CTA */}
-        <div className="flex flex-col gap-8 lg:mt-16">
+        <div className="flex flex-col items-center gap-8 text-center lg:mt-16 lg:items-start lg:text-left">
           <div
-            className="flex items-center gap-3 text-sm lg:text-base"
+            className="flex items-center justify-center gap-3 text-sm lg:justify-start lg:text-base"
             style={{ color: "var(--text-primary)" }}
           >
             <span>Acelerados por</span>
@@ -79,7 +79,7 @@ export function HeroSectionV2() {
             />
           </div>
 
-          <h2 className="display-heading text-[clamp(2rem,5vw,3.75rem)]">
+          <h2 className="display-heading text-[clamp(2.5rem,9vw,5rem)]">
             <span className="block">Tus riales.</span>
             <span className="block">Tu control.</span>
             <span className="block">Una sola app.</span>
@@ -170,18 +170,20 @@ export function HeroSectionV2() {
         </div>
 
         {/* Right: description + stat */}
-        <div className="flex flex-col gap-10 lg:gap-14">
-          <div className="flex flex-col gap-6">
-            <CrosshairMark />
+        <div className="flex flex-col items-center gap-10 text-center lg:items-start lg:gap-14 lg:text-left">
+          <div className="flex flex-col items-center gap-6 lg:items-start">
+            <div className="absolute right-6 top-44 lg:static lg:right-auto lg:top-auto">
+              <CrosshairMark />
+            </div>
             <p
-              className="text-lg lg:text-xl"
+              className="text-base lg:text-xl"
               style={{ lineHeight: 1.45, color: "var(--text-primary)" }}
             >
               Simplifica tu vida financiera. Nuestra app intuitiva hace que gestionar tu dinero sea fácil.
             </p>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col items-center gap-3 lg:items-start">
             <div className="flex items-center gap-5">
               <div className="flex shrink-0 -space-x-3">
                 {STAT_AVATARS.map((src) => (
