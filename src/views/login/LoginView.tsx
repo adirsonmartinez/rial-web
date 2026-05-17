@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -11,6 +12,7 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
+import { Eye, EyeSlash } from "@gravity-ui/icons";
 import { ThemeSwitcher } from "@/views/shared/ThemeSwitcher";
 import { useQrSpotlight } from "@/views/shared/useQrSpotlight";
 import { useLoginViewModel } from "./useLoginViewModel";
@@ -42,6 +44,7 @@ export function LoginView() {
   const { isSubmitting, errorMessage, signInWithEmail, signInWithGoogle } =
     useLoginViewModel();
   const { open: openQrSpotlight } = useQrSpotlight();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleCreateAccountClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -61,7 +64,7 @@ export function LoginView() {
       className="relative flex min-h-screen flex-col"
       style={{
         backgroundColor: "var(--bg-primary)",
-        ["--field-background" as string]: "var(--bg-secondary)",
+        ["--field-background" as string]: "var(--card-bg-subtle)",
         ["--field-border" as string]: "var(--border)",
       }}
     >
@@ -134,7 +137,7 @@ export function LoginView() {
               <FieldError />
             </TextField>
 
-            <TextField name="password" type="password" isRequired fullWidth>
+            <TextField name="password" type={showPassword ? "text" : "password"} isRequired fullWidth>
               <div className="flex items-center justify-between">
                 <Label>Contraseña</Label>
                 <Link
@@ -145,7 +148,18 @@ export function LoginView() {
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
-              <Input placeholder="••••••••" fullWidth />
+              <div className="relative">
+                <Input placeholder="••••••••" fullWidth className="pr-11" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md hover:bg-[var(--card-bg-hover)]"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {showPassword ? <EyeSlash width={18} height={18} /> : <Eye width={18} height={18} />}
+                </button>
+              </div>
               <FieldError />
             </TextField>
 
@@ -180,7 +194,7 @@ export function LoginView() {
               {isSubmitting ? "Ingresando…" : "Ingresar"}
             </Button>
 
-            <div className="my-2 flex items-center gap-4">
+            <div className="my-2 hidden items-center gap-4">
               <div className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
               <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                 o continúa con
@@ -192,7 +206,7 @@ export function LoginView() {
               type="button"
               variant="secondary"
               fullWidth
-              className="gap-2"
+              className="hidden gap-2"
               onPress={signInWithGoogle}
             >
               <GoogleIcon />

@@ -6,6 +6,7 @@ import { StatsSection } from "@/views/home/StatsSection";
 import { TeamSection } from "@/views/home/TeamSection";
 import { TestimonialsSection } from "@/views/home/TestimonialsSection";
 import { FaqSection } from "@/views/home/FaqSection";
+import { FinalCtaSection } from "@/views/home/FinalCtaSection";
 import { Footer } from "@/views/home/Footer";
 import { IntroOverlay } from "@/views/home/IntroOverlay";
 
@@ -21,6 +22,7 @@ export default function Home() {
       <TeamSection />
       <TestimonialsSection />
       <FaqSection />
+      <FinalCtaSection />
       <Footer />
     </div>
   );

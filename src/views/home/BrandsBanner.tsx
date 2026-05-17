@@ -1,10 +1,4 @@
-const PLACEHOLDER_LOGOS = [
-  "Logoipsum",
-  "logo · ipsum",
-  "Logoipsum",
-  "IPSUM",
-  "Logoipsum",
-];
+import Image from "next/image";
 
 export function BrandsBanner() {
   return (
@@ -79,19 +73,28 @@ export function BrandsBanner() {
               En alianza con marcas que están revolucionando los servicios financieros.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-14">
-              {PLACEHOLDER_LOGOS.map((name, i) => (
-                <span
-                  key={i}
-                  className="font-[family-name:var(--font-sora)] text-base font-bold uppercase tracking-wide lg:text-lg"
-                  style={{
-                    color: "var(--accent-foreground)",
-                    opacity: 0.55,
-                  }}
-                >
-                  {name}
-                </span>
-              ))}
+            <div className="flex flex-wrap items-center justify-center gap-10 lg:gap-16 [&_img]:brightness-0 [&_img]:opacity-60">
+              <Image
+                src="/logos/innoven-black.svg"
+                alt="innoven"
+                width={140}
+                height={28}
+                className="h-7 w-auto lg:h-9"
+              />
+              <Image
+                src="/logos/venflow-black.png"
+                alt="Venflow"
+                width={140}
+                height={28}
+                className="h-6 w-auto lg:h-8"
+              />
+              <Image
+                src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
+                alt="Stripe"
+                width={140}
+                height={28}
+                className="h-7 w-auto lg:h-9"
+              />
             </div>
           </div>
         </div>

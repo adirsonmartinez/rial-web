@@ -65,22 +65,6 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 max-w-md w-full lg:max-w-sm">
-            <p className="text-sm font-medium text-white lg:text-base">
-              Recibe consejos financieros y novedades de Rial.
-            </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Tu correo electrónico"
-                className="flex-1 rounded-full px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none"
-                style={{ backgroundColor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}
-              />
-              <button className="btn-pill bg-[#ACE524] text-[#161616] px-5 py-2.5 text-xs font-medium uppercase tracking-wider cursor-pointer">
-                Suscribir
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Divider */}
@@ -112,8 +96,8 @@ export function Footer() {
               <p className="text-xs text-white/30">
                 © {new Date().getFullYear()} Rial. Todos los derechos reservados.
               </p>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-white/30">Pagos por</span>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="text-xs text-white/30">Pagos seguros con</span>
                 <a href="https://www.venflow.app/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80">
                   <Image
                     src="/logos/venflow-white.png"
@@ -123,6 +107,31 @@ export function Footer() {
                     className="h-auto opacity-40 hover:opacity-70 transition-opacity"
                   />
                 </a>
+                <span className="text-xs text-white/30">y</span>
+                <a href="https://stripe.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80">
+                  <Image
+                    src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
+                    alt="Stripe"
+                    width={50}
+                    height={16}
+                    className="h-4 w-auto opacity-40 brightness-0 invert hover:opacity-70 transition-opacity"
+                  />
+                </a>
+                <span className="mx-1 h-3 w-px bg-white/15" aria-hidden="true" />
+                <Image
+                  src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Visa_Inc._logo_%282021%E2%80%93present%29.svg"
+                  alt="Visa"
+                  width={40}
+                  height={14}
+                  className="h-2.5 w-auto opacity-40 brightness-0 invert"
+                />
+                <Image
+                  src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                  alt="Mastercard"
+                  width={26}
+                  height={16}
+                  className="h-4 w-auto opacity-40 brightness-0 invert"
+                />
               </div>
             </div>
           </div>
