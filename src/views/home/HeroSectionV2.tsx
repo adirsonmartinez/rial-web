@@ -79,7 +79,7 @@ export function HeroSectionV2() {
             />
           </div>
 
-          <h2 className="display-heading text-[clamp(2.5rem,9vw,5rem)]">
+          <h2 className="display-heading text-[clamp(2.5rem,7vw,3.75rem)]">
             <span className="block">Tus riales.</span>
             <span className="block">Tu control.</span>
             <span className="block">Una sola app.</span>
