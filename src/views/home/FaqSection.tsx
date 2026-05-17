@@ -7,7 +7,7 @@ const FAQS = [
   {
     question: "¿Qué monedas puedo gestionar con Rial?",
     answer:
-      "Rial te permite organizar tus finanzas en bolívares (VES), dólares (USD) y euros (EUR) desde una sola app. Puedes registrar ingresos, gastos y ahorros en cualquiera de estas monedas.",
+      "Rial te permite organizar tus finanzas en bolívares (VES), dólares (USD) y USDT (Tether) desde una sola app. Puedes registrar ingresos, gastos y ahorros en cualquiera de estas monedas.",
   },
   {
     question: "¿Rial está conectado a mi cuenta bancaria?",

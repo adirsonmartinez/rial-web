@@ -130,7 +130,20 @@ export function LoginView() {
             </p>
           </div>
 
-          <Form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <Form
+            onSubmit={onSubmit}
+            className="flex flex-col gap-4"
+            onKeyDown={(e) => {
+              if (
+                e.key === "Enter" &&
+                !e.shiftKey &&
+                (e.target as HTMLElement).tagName === "INPUT"
+              ) {
+                e.preventDefault();
+                e.currentTarget.requestSubmit();
+              }
+            }}
+          >
             <TextField name="email" type="email" isRequired fullWidth>
               <Label>Email</Label>
               <Input placeholder="tu@email.com" fullWidth />

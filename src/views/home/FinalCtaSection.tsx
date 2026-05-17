@@ -28,7 +28,7 @@ export function FinalCtaSection() {
           className="mt-5 max-w-xl text-base lg:text-lg"
           style={{ color: "var(--text-secondary)", lineHeight: 1.55 }}
         >
-          Descarga Rial gratis y toma el control de tus finanzas en bolívares, dólares y euros.
+          Descarga Rial gratis y toma el control de tus finanzas en bolívares, dólares y USDT.
         </p>
 
         <Link

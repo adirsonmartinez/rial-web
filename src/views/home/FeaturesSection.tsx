@@ -19,7 +19,7 @@ const FEATURES_TOP = [
   {
     icon: CircleDollar,
     title: "Multimoneda",
-    description: "Bolívares, dólares y euros en un solo balance.",
+    description: "Bolívares, dólares y USDT en un solo balance.",
   },
   {
     icon: TargetDart,

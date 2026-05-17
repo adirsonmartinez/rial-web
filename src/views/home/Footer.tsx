@@ -40,7 +40,7 @@ export function Footer() {
               className="h-auto"
             />
             <p className="text-sm text-white/50" style={{ lineHeight: 1.6 }}>
-              La app de finanzas personales para Venezuela. Organiza, ahorra y gestiona tu dinero en bolívares, dólares y euros.
+              La app de finanzas personales para Venezuela. Organiza, ahorra y gestiona tu dinero en bolívares, dólares y USDT.
             </p>
             {/* Download buttons */}
             <div className="flex gap-2 mt-2">

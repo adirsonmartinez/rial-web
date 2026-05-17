@@ -5,7 +5,7 @@ import { Megaphone } from "@gravity-ui/icons";
 const NEWS = [
   {
     tag: "Producto",
-    title: "Rial lanza cuentas multimoneda para gestionar bolívares, dólares y euros",
+    title: "Rial lanza cuentas multimoneda para gestionar bolívares, dólares y USDT",
     date: "15 Abr 2026",
   },
   {
