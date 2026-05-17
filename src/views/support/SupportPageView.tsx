@@ -122,15 +122,39 @@ export function SupportPageView() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr]">
             {/* Form card */}
-            <div
-              className="rounded-[32px] p-8 lg:p-10"
+            <section
+              className="rounded-2xl p-2"
               style={{
-                backgroundColor: "var(--bg-card)",
-                boxShadow: "var(--border) 0px 0px 0px 1px",
+                backgroundColor: "var(--bg-card-outer)",
+                border: "1px solid var(--border)",
                 ["--field-background" as string]: "var(--card-bg-subtle)",
                 ["--field-border" as string]: "var(--border)",
               }}
             >
+              <header className="flex items-start justify-between gap-3 px-3 pt-2 pb-3">
+                <div className="min-w-0">
+                  <span
+                    className="text-[11px] font-semibold uppercase tracking-wide"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    Formulario
+                  </span>
+                  <h2
+                    className="mt-1 text-base font-semibold leading-tight"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    Envíanos un mensaje
+                  </h2>
+                </div>
+              </header>
+              <div
+                className="overflow-hidden rounded-xl"
+                style={{
+                  backgroundColor: "var(--bg-card)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                <div className="p-5 lg:p-6">
               {submitted ? (
                 <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-4 text-center">
                   <div
@@ -171,23 +195,7 @@ export function SupportPageView() {
                   </Button>
                 </div>
               ) : (
-                <>
-                  <div className="mb-6">
-                    <h2
-                      className="font-[family-name:var(--font-sora)] text-2xl font-bold lg:text-3xl"
-                      style={{ color: "var(--text-primary)" }}
-                    >
-                      Envíanos un mensaje
-                    </h2>
-                    <p
-                      className="mt-2 text-sm"
-                      style={{ color: "var(--text-muted)" }}
-                    >
-                      Completa el formulario y te respondemos por correo.
-                    </p>
-                  </div>
-
-                  <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <TextField name="nombre" isRequired fullWidth>
                         <Label>Nombre</Label>
@@ -231,86 +239,101 @@ export function SupportPageView() {
                       />
                     </div>
 
-                    <Button type="submit" variant="primary" className="mt-2 self-start">
-                      Enviar mensaje
-                    </Button>
-                  </Form>
-                </>
+                  <Button type="submit" variant="primary" className="mt-2 self-start">
+                    Enviar mensaje
+                  </Button>
+                </Form>
               )}
-            </div>
+                </div>
+              </div>
+            </section>
 
             {/* Contact channels */}
-            <div className="flex flex-col gap-3">
-              <div
-                className="rounded-[32px] p-6 lg:p-8"
-                style={{
-                  backgroundColor: "var(--accent)",
-                  color: "var(--accent-foreground)",
-                }}
-              >
-                <h3 className="font-[family-name:var(--font-sora)] text-xl font-bold lg:text-2xl">
-                  Otros canales
-                </h3>
-                <p className="mt-2 text-sm" style={{ lineHeight: 1.5 }}>
-                  Si prefieres, escríbenos directo por cualquiera de estos medios.
-                </p>
-              </div>
-
-              {CONTACT_CHANNELS.map(({ label, value, href, iconPath }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="group flex items-center gap-4 rounded-2xl p-4 transition-colors lg:p-5"
-                  style={{
-                    backgroundColor: "var(--bg-card)",
-                    boxShadow: "var(--border) 0px 0px 0px 1px",
-                  }}
-                >
-                  <div
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors group-hover:scale-105"
-                    style={{
-                      backgroundColor: "var(--accent-soft-bg)",
-                      color: "var(--accent-soft-icon)",
-                    }}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d={iconPath} />
-                    </svg>
-                  </div>
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <span
-                      className="text-xs font-medium uppercase tracking-wider"
-                      style={{ color: "var(--text-muted)" }}
-                    >
-                      {label}
-                    </span>
-                    <span
-                      className="truncate text-sm font-medium lg:text-base"
-                      style={{ color: "var(--text-primary)" }}
-                    >
-                      {value}
-                    </span>
-                  </div>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="shrink-0 transition-transform group-hover:translate-x-0.5"
+            <section
+              className="rounded-2xl p-2"
+              style={{
+                backgroundColor: "var(--bg-card-outer)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              <header className="flex items-start justify-between gap-3 px-3 pt-2 pb-3">
+                <div className="min-w-0">
+                  <span
+                    className="text-[11px] font-semibold uppercase tracking-wide"
                     style={{ color: "var(--text-muted)" }}
                   >
-                    <line x1="7" y1="17" x2="17" y2="7" />
-                    <polyline points="7 7 17 7 17 17" />
-                  </svg>
-                </a>
-              ))}
-            </div>
+                    Canales directos
+                  </span>
+                  <h2
+                    className="mt-1 text-base font-semibold leading-tight"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    Otros canales
+                  </h2>
+                </div>
+              </header>
+              <div
+                className="overflow-hidden rounded-xl"
+                style={{
+                  backgroundColor: "var(--bg-card)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                {CONTACT_CHANNELS.map(({ label, value, href, iconPath }, idx) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target={href.startsWith("http") ? "_blank" : undefined}
+                    rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                    className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-[var(--card-bg-hover)]"
+                    style={{
+                      borderTop: idx === 0 ? undefined : "1px solid var(--border)",
+                    }}
+                  >
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                      style={{
+                        backgroundColor: "var(--accent-soft-bg)",
+                        color: "var(--accent-soft-icon)",
+                      }}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d={iconPath} />
+                      </svg>
+                    </div>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <span
+                        className="text-[11px] font-semibold uppercase tracking-wide"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        {label}
+                      </span>
+                      <span
+                        className="truncate text-sm font-medium"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {value}
+                      </span>
+                    </div>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0 transition-transform group-hover:translate-x-0.5"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      <line x1="7" y1="17" x2="17" y2="7" />
+                      <polyline points="7 7 17 7 17 17" />
+                    </svg>
+                  </a>
+                ))}
+              </div>
+            </section>
           </div>
         </div>
       </section>
