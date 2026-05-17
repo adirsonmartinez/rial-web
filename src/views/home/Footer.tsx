@@ -5,7 +5,8 @@ import Image from "next/image";
 const COMPANY_LINKS: { label: string; href: string }[] = [
   { label: "Nosotros", href: "#" },
   { label: "Soporte", href: "/soporte" },
-  { label: "Política de privacidad", href: "#" },
+  { label: "Política de privacidad", href: "/privacidad" },
+  { label: "Términos y condiciones", href: "/condiciones" },
 ];
 
 function AppleIcon() {
