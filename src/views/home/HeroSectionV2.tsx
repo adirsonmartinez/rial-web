@@ -18,10 +18,8 @@ export function HeroSectionV2() {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const handleDownloadClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (window.matchMedia("(min-width: 768px)").matches) {
-      e.preventDefault();
-      openQrSpotlight();
-    }
+    e.preventDefault();
+    openQrSpotlight();
   };
 
   const handleMouseMove = (e: MouseEvent<HTMLElement>) => {

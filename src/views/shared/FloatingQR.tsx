@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { Button, Modal } from "@heroui/react";
 import { QRCodeSVG } from "qrcode.react";
+import { AppStoreBadge, GooglePlayBadge } from "@/views/home/StoreBadges";
 import { useQrSpotlight } from "./useQrSpotlight";
 
 const SITE_URL =
@@ -9,6 +12,15 @@ const DOWNLOAD_URL = `${SITE_URL.replace(/\/$/, "")}/descargar`;
 
 export function FloatingQR() {
   const { isOpen, close } = useQrSpotlight();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const onChange = () => setIsMobile(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   return (
     <>
@@ -101,6 +113,39 @@ export function FloatingQR() {
         </div>
       </div>
     </aside>
+
+      <Modal.Backdrop
+        isOpen={isOpen && isMobile}
+        onOpenChange={(open) => {
+          if (!open) close();
+        }}
+      >
+        <Modal.Container>
+          <Modal.Dialog className="sm:max-w-[400px]">
+            <Modal.CloseTrigger />
+            <Modal.Header>
+              <Modal.Heading>Descarga Rial</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <p
+                className="text-sm"
+                style={{ color: "var(--text-secondary)", lineHeight: 1.5 }}
+              >
+                Descárgala gratis en tu tienda favorita y empieza a organizar tu dinero hoy.
+              </p>
+              <div className="mt-5 flex flex-col items-center gap-3">
+                <AppStoreBadge />
+                <GooglePlayBadge />
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button slot="close" variant="secondary" fullWidth>
+                Cerrar
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </>
   );
 }

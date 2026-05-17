@@ -89,6 +89,12 @@ body {
   color: var(--text-primary);
 }
 
+/* HeroUI Button overrides — keep the secondary variant readable in both themes */
+.button--secondary,
+.button--tertiary {
+  --button-fg: var(--text-primary);
+}
+
 /* Display headings — Sora ExtraBold 800, tight */
 .display-heading {
   font-family: var(--font-sora), sans-serif;

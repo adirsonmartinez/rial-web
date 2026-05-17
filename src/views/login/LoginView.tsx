@@ -186,7 +186,6 @@ export function LoginView() {
               variant="secondary"
               fullWidth
               className="gap-2"
-              style={{ ["--button-fg" as string]: "var(--text-primary)" }}
               onPress={signInWithGoogle}
             >
               <GoogleIcon />
