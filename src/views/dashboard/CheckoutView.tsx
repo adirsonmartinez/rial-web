@@ -6,11 +6,11 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import {
   ArrowLeft,
-  ArrowsRotateRight,
   Check,
+  CircleDollar,
   CrownDiamond,
+  Globe,
   ShieldCheck,
-  Thunderbolt,
 } from "@gravity-ui/icons";
 
 type Cadence = "mensual" | "trimestral" | "semestral" | "anual";
@@ -61,43 +61,46 @@ const cadenceCatalog: Record<Cadence, CadencePricing> = {
   },
 };
 
-type PaymentMethodId = "debito-inmediato" | "domiciliacion";
+type PaymentCurrencyId = "bolivares" | "otra";
 
-type PaymentMethodOption = {
-  id: PaymentMethodId;
+type PaymentCurrencyOption = {
+  id: PaymentCurrencyId;
   name: string;
   description: string;
-  icon: typeof Thunderbolt;
+  icon: typeof CircleDollar;
   badge?: string;
+  disabled?: boolean;
 };
 
-const paymentMethods: PaymentMethodOption[] = [
+const paymentCurrencies: PaymentCurrencyOption[] = [
   {
-    id: "debito-inmediato",
-    name: "Débito inmediato",
+    id: "bolivares",
+    name: "Suscribirse con Bolívares",
     description:
-      "Autorizas un único cargo desde tu cuenta bancaria en este momento.",
-    icon: Thunderbolt,
+      "Domiciliación con tu cuenta bancaria local. Cancela cuando quieras.",
+    icon: CircleDollar,
+    badge: "Recomendado",
   },
   {
-    id: "domiciliacion",
-    name: "Domiciliación",
+    id: "otra",
+    name: "Suscribirse con otra moneda",
     description:
-      "Autorizas cargos automáticos en cada renovación. Cancela cuando quieras.",
-    icon: ArrowsRotateRight,
-    badge: "Recomendado",
+      "Paga en USD desde cualquier país con tarjeta internacional.",
+    icon: Globe,
+    badge: "Próximamente",
+    disabled: true,
   },
 ];
 
 const formatUsd = (value: number) =>
   `$${value.toFixed(2).replace(".", ",")}`;
 
-function PaymentMethodCard({
+function PaymentCurrencyCard({
   option,
   isSelected,
   onSelect,
 }: {
-  option: PaymentMethodOption;
+  option: PaymentCurrencyOption;
   isSelected: boolean;
   onSelect: () => void;
 }) {
@@ -105,9 +108,13 @@ function PaymentMethodCard({
   return (
     <button
       type="button"
-      onClick={onSelect}
+      onClick={option.disabled ? undefined : onSelect}
       aria-pressed={isSelected}
-      className="flex w-full items-start gap-4 rounded-2xl p-5 text-left transition-colors"
+      aria-disabled={option.disabled}
+      disabled={option.disabled}
+      className={`flex w-full items-start gap-4 rounded-2xl p-5 text-left transition-colors ${
+        option.disabled ? "cursor-not-allowed opacity-60" : ""
+      }`}
       style={{
         backgroundColor: isSelected
           ? "var(--accent-soft-bg)"
@@ -169,8 +176,8 @@ function PaymentMethodCard({
 
 export function CheckoutView({ cadence }: { cadence: Cadence }) {
   const pricing = cadenceCatalog[cadence];
-  const [selectedMethod, setSelectedMethod] =
-    useState<PaymentMethodId>("domiciliacion");
+  const [selectedCurrency, setSelectedCurrency] =
+    useState<PaymentCurrencyId>("bolivares");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -325,12 +332,12 @@ export function CheckoutView({ cadence }: { cadence: Cadence }) {
           </div>
 
           <div className="flex flex-col gap-3">
-            {paymentMethods.map((option) => (
-              <PaymentMethodCard
+            {paymentCurrencies.map((option) => (
+              <PaymentCurrencyCard
                 key={option.id}
                 option={option}
-                isSelected={selectedMethod === option.id}
-                onSelect={() => setSelectedMethod(option.id)}
+                isSelected={selectedCurrency === option.id}
+                onSelect={() => setSelectedCurrency(option.id)}
               />
             ))}
           </div>
@@ -355,7 +362,7 @@ export function CheckoutView({ cadence }: { cadence: Cadence }) {
             </p>
           )}
 
-          {selectedMethod === "domiciliacion" && (
+          {selectedCurrency === "bolivares" && (
             <div
               className="flex items-center justify-center gap-1.5 text-xs"
               style={{ color: "var(--text-muted)" }}
