@@ -130,20 +130,22 @@ export function LoginView() {
             </p>
           </div>
 
-          <Form
-            onSubmit={onSubmit}
-            className="flex flex-col gap-4"
+          <div
             onKeyDown={(e) => {
               if (
                 e.key === "Enter" &&
                 !e.shiftKey &&
                 (e.target as HTMLElement).tagName === "INPUT"
               ) {
-                e.preventDefault();
-                e.currentTarget.requestSubmit();
+                const form = (e.target as HTMLElement).closest("form");
+                if (form) {
+                  e.preventDefault();
+                  form.requestSubmit();
+                }
               }
             }}
           >
+          <Form onSubmit={onSubmit} className="flex flex-col gap-4">
             <TextField name="email" type="email" isRequired fullWidth>
               <Label>Email</Label>
               <Input placeholder="tu@email.com" fullWidth />
@@ -226,6 +228,7 @@ export function LoginView() {
               Ingresar con Google
             </Button>
           </Form>
+          </div>
 
           <p
             className="mt-8 text-center text-sm"
