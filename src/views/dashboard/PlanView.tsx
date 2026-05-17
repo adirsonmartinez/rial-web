@@ -50,7 +50,7 @@ export const cadences: CadenceInfo[] = [
   {
     id: "trimestral",
     tabLabel: "Trimestral",
-    monthlyEquivalent: "$4,50",
+    monthlyEquivalent: "$4,49",
     totalPrice: "$13,49",
     helper: "/mes · $13,49 cada 3 meses",
     discountPct: 10,
@@ -59,7 +59,7 @@ export const cadences: CadenceInfo[] = [
   {
     id: "semestral",
     tabLabel: "Semestral",
-    monthlyEquivalent: "$4,00",
+    monthlyEquivalent: "$3,99",
     totalPrice: "$23,99",
     helper: "/mes · $23,99 cada 6 meses",
     discountPct: 20,
@@ -68,7 +68,7 @@ export const cadences: CadenceInfo[] = [
   {
     id: "anual",
     tabLabel: "Anual",
-    monthlyEquivalent: "$3,50",
+    monthlyEquivalent: "$3,49",
     totalPrice: "$41,99",
     helper: "/mes · $41,99 al año",
     discountPct: 30,

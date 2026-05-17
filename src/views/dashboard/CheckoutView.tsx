@@ -38,7 +38,7 @@ const cadenceCatalog: Record<Cadence, CadencePricing> = {
     label: "Trimestral",
     cadenceLabel: "Se renueva cada 3 meses",
     totalUsd: 13.49,
-    monthlyEquivalent: "$4,50 / mes",
+    monthlyEquivalent: "$4,49 / mes",
     renewalCopy:
       "Se renueva automáticamente cada 3 meses hasta que canceles.",
   },
@@ -47,7 +47,7 @@ const cadenceCatalog: Record<Cadence, CadencePricing> = {
     label: "Semestral",
     cadenceLabel: "Se renueva cada 6 meses",
     totalUsd: 23.99,
-    monthlyEquivalent: "$4,00 / mes",
+    monthlyEquivalent: "$3,99 / mes",
     renewalCopy:
       "Se renueva automáticamente cada 6 meses hasta que canceles.",
   },
@@ -56,7 +56,7 @@ const cadenceCatalog: Record<Cadence, CadencePricing> = {
     label: "Anual",
     cadenceLabel: "Se renueva cada año",
     totalUsd: 41.99,
-    monthlyEquivalent: "$3,50 / mes",
+    monthlyEquivalent: "$3,49 / mes",
     renewalCopy: "Se renueva automáticamente cada año hasta que canceles.",
   },
 };
