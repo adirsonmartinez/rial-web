@@ -1,8 +1,10 @@
 import type { AdminSupabaseClient } from "@/lib/supabase/admin";
 import type {
+  InvoiceCreateEvent,
   PaymentFailedEvent,
   PaymentSuccessEvent,
   SubscriptionCancelledEvent,
+  SubscriptionCreateEvent,
   VenflowWebhookEvent,
 } from "./types";
 
@@ -121,7 +123,8 @@ export async function handlePaymentSuccess(
   const now = new Date();
   const periodEnd = computePeriodEnd(now, venflowCycle);
 
-  // Read existing row to preserve started_at and merge metadata
+  // Read existing row to preserve started_at, merge metadata, and pull
+  // the invoice ID stored by handleInvoiceCreate (if any)
   const { data: existing } = await supabase
     .from("subscriptions")
     .select("started_at, metadata")
@@ -133,6 +136,10 @@ export async function handlePaymentSuccess(
     (existing?.metadata as Record<string, unknown> | null) ?? {};
   const startedAt =
     (existing?.started_at as string | null) ?? now.toISOString();
+  const pendingInvoiceId =
+    typeof existingMetadata.last_invoice_id === "string"
+      ? (existingMetadata.last_invoice_id as string)
+      : null;
 
   const { data: upsertedSub, error: subErr } = await supabase
     .from("subscriptions")
@@ -178,6 +185,7 @@ export async function handlePaymentSuccess(
         status: "succeeded",
         provider: "venflow",
         provider_payment_id: event.payment.id,
+        provider_invoice_id: pendingInvoiceId,
         paid_at: now.toISOString(),
         metadata: {
           gateway_uuid: event.payment.gatewayUUID,
@@ -289,4 +297,105 @@ export async function handlePaymentFailed(
     },
     { onConflict: "provider,provider_payment_id" },
   );
+
+  // Move the subscription to past_due if it was still active/trialing.
+  // A subsequent PAYMENT_SUCCESS_EVENT will bring it back to active.
+  await supabase
+    .from("subscriptions")
+    .update({ status: "past_due" })
+    .eq("id", sub.id)
+    .in("status", ["active", "trialing"]);
+}
+
+export async function handleSubscriptionCreate(
+  event: SubscriptionCreateEvent,
+  supabase: AdminSupabaseClient,
+): Promise<void> {
+  const { data: existing } = await supabase
+    .from("subscriptions")
+    .select("id, metadata")
+    .eq("provider", "venflow")
+    .eq("provider_customer_id", event.client.id)
+    .maybeSingle();
+
+  if (!existing) {
+    // PAYMENT_SUCCESS_EVENT hasn't fired yet — the row will be created
+    // there. Venflow may resend events out of order, so we skip and rely
+    // on the next SUBSCRIPTION_CREATE_EVENT (or a backfill) to populate.
+    console.warn(
+      "[venflow] SUBSCRIPTION_CREATE_EVENT: subscription row not yet created",
+      {
+        client_id: event.client.id,
+        subscription_id: event.subscription.id,
+      },
+    );
+    return;
+  }
+
+  const existingMetadata =
+    (existing.metadata as Record<string, unknown> | null) ?? {};
+
+  const { error } = await supabase
+    .from("subscriptions")
+    .update({
+      provider_subscription_id: event.subscription.id,
+      provider_product_id: event.subscription.externalId ?? null,
+      metadata: {
+        ...existingMetadata,
+        subscription_external_id: event.subscription.externalId ?? null,
+      },
+    })
+    .eq("id", existing.id as string);
+
+  if (error) {
+    console.error(
+      "[venflow] SUBSCRIPTION_CREATE_EVENT: failed to update IDs",
+      error,
+    );
+    throw error;
+  }
+}
+
+export async function handleInvoiceCreate(
+  event: InvoiceCreateEvent,
+  supabase: AdminSupabaseClient,
+): Promise<void> {
+  // Stash the invoice ID on the subscription so the next PAYMENT_SUCCESS_EVENT
+  // can write it as provider_invoice_id on the subscription_payments row.
+  const { data: existing } = await supabase
+    .from("subscriptions")
+    .select("id, metadata")
+    .eq("provider", "venflow")
+    .eq("provider_customer_id", event.client.id)
+    .maybeSingle();
+
+  if (!existing) {
+    console.warn("[venflow] INVOICE_CREATE_EVENT: subscription not found", {
+      client_id: event.client.id,
+      invoice_id: event.invoice.id,
+    });
+    return;
+  }
+
+  const existingMetadata =
+    (existing.metadata as Record<string, unknown> | null) ?? {};
+
+  const { error } = await supabase
+    .from("subscriptions")
+    .update({
+      metadata: {
+        ...existingMetadata,
+        last_invoice_id: event.invoice.id,
+        last_invoice_status: event.invoice.status,
+      },
+    })
+    .eq("id", existing.id as string);
+
+  if (error) {
+    console.error(
+      "[venflow] INVOICE_CREATE_EVENT: failed to store invoice id",
+      error,
+    );
+    throw error;
+  }
 }
