@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LayoutSideContent } from "@gravity-ui/icons";
-import { ThemeSwitcher } from "@/views/shared/ThemeSwitcher";
+import { ThemeToggleButton } from "@/views/shared/ThemeToggleButton";
 
 function greetingForHour(hour: number): string {
   if (hour >= 5 && hour < 12) return "Buenos días";
@@ -48,7 +48,7 @@ export function Topbar({ userName, onToggleSidebar }: TopbarProps) {
         {greeting}, {userName.trim().split(/\s+/)[0]}
       </h1>
       <div className="ml-auto">
-        <ThemeSwitcher />
+        <ThemeToggleButton />
       </div>
     </header>
   );

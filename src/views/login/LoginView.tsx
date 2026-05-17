@@ -13,7 +13,7 @@ import {
   TextField,
 } from "@heroui/react";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
-import { ThemeSwitcher } from "@/views/shared/ThemeSwitcher";
+import { ThemeToggleButton } from "@/views/shared/ThemeToggleButton";
 import { useQrSpotlight } from "@/views/shared/useQrSpotlight";
 import { useLoginViewModel } from "./useLoginViewModel";
 
@@ -101,7 +101,7 @@ export function LoginView() {
               priority
             />
           </Link>
-          <ThemeSwitcher />
+          <ThemeToggleButton />
         </div>
       </header>
 
