@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 
-const COMPANY_LINKS = ["Nosotros", "Contacto", "Política de privacidad"];
+const COMPANY_LINKS: { label: string; href: string }[] = [
+  { label: "Nosotros", href: "#" },
+  { label: "Soporte", href: "/soporte" },
+  { label: "Política de privacidad", href: "#" },
+];
 
 function AppleIcon() {
   return (
@@ -98,8 +102,8 @@ export function Footer() {
           <div className="flex flex-col items-center gap-3 sm:items-start">
             <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:justify-start">
               {COMPANY_LINKS.map((link) => (
-                <a key={link} href="#" className="text-sm text-white/60 hover:text-white transition-colors">
-                  {link}
+                <a key={link.label} href={link.href} className="text-sm text-white/60 hover:text-white transition-colors">
+                  {link.label}
                 </a>
               ))}
             </div>
