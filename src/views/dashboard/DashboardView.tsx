@@ -213,13 +213,16 @@ function ExchangeRatesCard({
   source: string;
 }) {
   return (
-    <article
-      className="rounded-[30px] p-6"
-      style={{ backgroundColor: "var(--bg-card)" }}
+    <section
+      className="rounded-2xl p-2"
+      style={{
+        backgroundColor: "var(--bg-card-outer)",
+        border: "1px solid var(--border)",
+      }}
     >
-      <header className="mb-4 flex items-baseline justify-between">
+      <header className="flex items-start justify-between gap-3 px-3 pt-2 pb-3">
         <h3
-          className="text-base font-semibold"
+          className="text-base font-semibold leading-tight"
           style={{ color: "var(--text-primary)" }}
         >
           Tasas de cambio
@@ -231,39 +234,47 @@ function ExchangeRatesCard({
           {source}
         </span>
       </header>
-      <ul className="flex flex-col gap-3">
-        {rates.map((item) => (
-          <li
-            key={item.code}
-            className="flex items-center justify-between gap-3"
-          >
-            <div className="flex items-center gap-3">
-              <CurrencyIcon code={item.code} />
-              <div className="flex flex-col">
-                <span
-                  className="text-sm font-medium leading-tight"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {item.code}
-                </span>
-                <span
-                  className="text-xs leading-tight"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  {item.label}
-                </span>
-              </div>
-            </div>
-            <span
-              className="text-sm font-semibold"
-              style={{ color: "var(--text-primary)" }}
+      <div
+        className="overflow-hidden rounded-xl"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          border: "1px solid var(--border)",
+        }}
+      >
+        <ul className="flex flex-col gap-3 px-6 py-5">
+          {rates.map((item) => (
+            <li
+              key={item.code}
+              className="flex items-center justify-between gap-3"
             >
-              {item.rate}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </article>
+              <div className="flex items-center gap-3">
+                <CurrencyIcon code={item.code} />
+                <div className="flex flex-col">
+                  <span
+                    className="text-sm font-medium leading-tight"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {item.code}
+                  </span>
+                  <span
+                    className="text-xs leading-tight"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+              </div>
+              <span
+                className="text-sm font-semibold"
+                style={{ color: "var(--text-primary)" }}
+              >
+                {item.rate}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 
@@ -273,10 +284,13 @@ function MoneyFlowCard({ item }: { item: MoneyFlow }) {
   return (
     <Link
       href={item.href}
-      className="flex flex-col gap-3 rounded-full p-6 no-underline transition-colors hover:bg-[var(--card-bg-hover)]"
-      style={{ backgroundColor: "var(--bg-card)" }}
+      className="block rounded-2xl p-2 no-underline transition-colors hover:bg-[var(--card-bg-hover)]"
+      style={{
+        backgroundColor: "var(--bg-card-outer)",
+        border: "1px solid var(--border)",
+      }}
     >
-      <header className="flex items-center justify-between gap-3">
+      <header className="flex items-center justify-between gap-3 px-3 pt-2 pb-3">
         <div className="flex items-center gap-3">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full text-white"
@@ -284,12 +298,12 @@ function MoneyFlowCard({ item }: { item: MoneyFlow }) {
           >
             <Icon width={18} height={18} />
           </div>
-          <span
-            className="text-base font-semibold"
+          <h3
+            className="text-base font-semibold leading-tight"
             style={{ color: "var(--text-primary)" }}
           >
             {item.label}
-          </span>
+          </h3>
         </div>
         <ChevronRight
           width={18}
@@ -297,12 +311,20 @@ function MoneyFlowCard({ item }: { item: MoneyFlow }) {
           style={{ color: "var(--text-muted)" }}
         />
       </header>
-      <p
-        className="display-heading text-2xl"
-        style={{ color: "var(--text-primary)" }}
+      <div
+        className="overflow-hidden rounded-xl"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          border: "1px solid var(--border)",
+        }}
       >
-        {item.amount}
-      </p>
+        <p
+          className="display-heading px-6 py-5 text-2xl"
+          style={{ color: "var(--text-primary)" }}
+        >
+          {item.amount}
+        </p>
+      </div>
     </Link>
   );
 }
@@ -310,27 +332,33 @@ function MoneyFlowCard({ item }: { item: MoneyFlow }) {
 function BalanceAccountCard({ item }: { item: BalanceCardItem }) {
   return (
     <article
-      className="flex h-full flex-col rounded-[30px] p-4"
-      style={{ backgroundColor: "var(--card-bg-subtle)" }}
+      className="flex h-full flex-col rounded-2xl p-2"
+      style={{
+        backgroundColor: "var(--bg-card-outer)",
+        border: "1px solid var(--border)",
+      }}
     >
-      <header className="mb-4 flex items-center gap-3 px-2">
+      <header className="flex items-center gap-3 px-3 pt-2 pb-3">
         <div
           className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full text-xl leading-none"
           aria-hidden
         >
           <span>{item.flag}</span>
         </div>
-        <span
-          className="text-lg font-medium"
+        <h3
+          className="text-base font-semibold leading-tight"
           style={{ color: "var(--text-primary)" }}
         >
           {item.currency}
-        </span>
+        </h3>
       </header>
 
       <div
-        className="flex flex-1 flex-col rounded-xl p-5"
-        style={{ backgroundColor: "var(--bg-card)" }}
+        className="flex flex-1 flex-col overflow-hidden rounded-xl px-5 py-5"
+        style={{
+          backgroundColor: "var(--bg-card)",
+          border: "1px solid var(--border)",
+        }}
       >
         <p
           className="display-heading text-[clamp(1.5rem,2.5vw,2rem)]"
