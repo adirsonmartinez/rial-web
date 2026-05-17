@@ -90,9 +90,9 @@ body {
 }
 
 /* HeroUI Button overrides — keep the secondary variant readable in both themes */
-.button--secondary,
-.button--tertiary {
-  --button-fg: var(--text-primary);
+button.button--secondary,
+button.button--tertiary {
+  --button-fg: var(--text-primary) !important;
 }
 
 /* Display headings — Sora ExtraBold 800, tight */

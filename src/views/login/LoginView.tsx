@@ -12,6 +12,7 @@ import {
   TextField,
 } from "@heroui/react";
 import { ThemeSwitcher } from "@/views/shared/ThemeSwitcher";
+import { useQrSpotlight } from "@/views/shared/useQrSpotlight";
 import { useLoginViewModel } from "./useLoginViewModel";
 
 function GoogleIcon() {
@@ -40,6 +41,12 @@ function GoogleIcon() {
 export function LoginView() {
   const { isSubmitting, errorMessage, signInWithEmail, signInWithGoogle } =
     useLoginViewModel();
+  const { open: openQrSpotlight } = useQrSpotlight();
+
+  const handleCreateAccountClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    openQrSpotlight();
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -199,7 +206,8 @@ export function LoginView() {
           >
             ¿No tienes cuenta?{" "}
             <Link
-              href="/signup"
+              href="/descargar"
+              onClick={handleCreateAccountClick}
               className="font-medium no-underline hover:underline"
               style={{ color: "var(--text-primary)" }}
             >
