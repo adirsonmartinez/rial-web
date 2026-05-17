@@ -24,12 +24,25 @@ export async function POST(request: NextRequest) {
 
   const nowIso = new Date().toISOString();
 
+  // Read existing metadata so we merge instead of overwriting
+  const { data: existing } = await supabase
+    .from("subscriptions")
+    .select("metadata")
+    .eq("user_id", userId)
+    .eq("provider", "venflow")
+    .eq("status", "active")
+    .maybeSingle();
+
+  const existingMetadata =
+    (existing?.metadata as Record<string, unknown> | null) ?? {};
+
   const { data: sub, error: subErr } = await supabase
     .from("subscriptions")
     .update({
       cancel_at_period_end: true,
       cancelled_at: nowIso,
       metadata: {
+        ...existingMetadata,
         admin_action: { type: "cancel", at: nowIso },
       },
     })

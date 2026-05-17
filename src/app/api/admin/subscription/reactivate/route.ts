@@ -24,6 +24,17 @@ export async function POST(request: NextRequest) {
 
   const nowIso = new Date().toISOString();
 
+  // Read existing metadata so we merge instead of overwriting
+  const { data: existing } = await supabase
+    .from("subscriptions")
+    .select("metadata")
+    .eq("user_id", userId)
+    .eq("provider", "venflow")
+    .maybeSingle();
+
+  const existingMetadata =
+    (existing?.metadata as Record<string, unknown> | null) ?? {};
+
   const { data: sub, error: subErr } = await supabase
     .from("subscriptions")
     .update({
@@ -31,6 +42,7 @@ export async function POST(request: NextRequest) {
       cancelled_at: null,
       status: "active",
       metadata: {
+        ...existingMetadata,
         admin_action: { type: "reactivate", at: nowIso },
       },
     })
@@ -54,22 +66,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { error: userErr } = await supabase
-    .from("users")
-    .update({
-      subscription_status: "active",
-      subscription_plan: "plus",
-      subscription_expires_at: sub.current_period_end as string | null,
-    })
-    .eq("id", userId);
-
-  if (userErr) {
-    console.error("[admin reactivate] users update failed", userErr);
-    return NextResponse.json(
-      { error: "users_update_failed", message: userErr.message },
-      { status: 500 },
-    );
-  }
-
+  // users.subscription_* is owned by the sync_user_subscription trigger
+  // — no manual write here per docs/subscriptions-architecture.md
   return NextResponse.json({ ok: true, subscription: sub });
 }

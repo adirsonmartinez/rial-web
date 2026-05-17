@@ -40,11 +40,10 @@ export async function GET(request: NextRequest) {
   }
 
   const subIds = expiredSubs.map((s) => s.id as string);
-  const userIds = expiredSubs.map((s) => s.user_id as string);
 
   const { error: subUpdateErr } = await supabase
     .from("subscriptions")
-    .update({ status: "cancelled" })
+    .update({ status: "expired" })
     .in("id", subIds);
 
   if (subUpdateErr) {
@@ -58,26 +57,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const { error: userUpdateErr } = await supabase
-    .from("users")
-    .update({
-      subscription_status: "cancelled",
-      subscription_plan: "free",
-      subscription_expires_at: null,
-    })
-    .in("id", userIds);
-
-  if (userUpdateErr) {
-    console.error(
-      "[cron expire-subscriptions] users update failed",
-      userUpdateErr,
-    );
-    return NextResponse.json(
-      { error: "users_update_failed", message: userUpdateErr.message },
-      { status: 500 },
-    );
-  }
-
+  // users.subscription_* is owned by the sync_user_subscription trigger
+  // — no manual write here per docs/subscriptions-architecture.md
   console.log(
     "[cron expire-subscriptions] expired",
     expiredSubs.length,

@@ -121,6 +121,19 @@ export async function handlePaymentSuccess(
   const now = new Date();
   const periodEnd = computePeriodEnd(now, venflowCycle);
 
+  // Read existing row to preserve started_at and merge metadata
+  const { data: existing } = await supabase
+    .from("subscriptions")
+    .select("started_at, metadata")
+    .eq("provider", "venflow")
+    .eq("provider_customer_id", event.client.id)
+    .maybeSingle();
+
+  const existingMetadata =
+    (existing?.metadata as Record<string, unknown> | null) ?? {};
+  const startedAt =
+    (existing?.started_at as string | null) ?? now.toISOString();
+
   const { data: upsertedSub, error: subErr } = await supabase
     .from("subscriptions")
     .upsert(
@@ -131,11 +144,14 @@ export async function handlePaymentSuccess(
         billing_cycle: dbCycle,
         provider: "venflow",
         provider_customer_id: event.client.id,
+        started_at: startedAt,
         current_period_start: now.toISOString(),
         current_period_end: periodEnd.toISOString(),
+        expires_at: periodEnd.toISOString(),
         cancelled_at: null,
         cancel_at_period_end: false,
         metadata: {
+          ...existingMetadata,
           last_payment_id: event.payment.id,
           last_session_id: event.session?.id ?? null,
           gateway_uuid: event.payment.gatewayUUID,
@@ -157,7 +173,7 @@ export async function handlePaymentSuccess(
       {
         subscription_id: upsertedSub.id,
         user_id: userId,
-        amount: event.payment.amount,
+        amount: Number(event.payment.amount),
         currency: "VES",
         status: "succeeded",
         provider: "venflow",
@@ -177,19 +193,8 @@ export async function handlePaymentSuccess(
     throw payErr;
   }
 
-  const { error: userErr } = await supabase
-    .from("users")
-    .update({
-      subscription_plan: "plus",
-      subscription_status: "active",
-      subscription_expires_at: periodEnd.toISOString(),
-    })
-    .eq("id", userId);
-
-  if (userErr) {
-    console.error("[venflow] Failed to update user plan", userErr);
-    throw userErr;
-  }
+  // users.subscription_* is owned by the sync_user_subscription trigger
+  // — no manual write here per docs/subscriptions-architecture.md
 }
 
 export async function handleSubscriptionCancelled(
@@ -207,12 +212,24 @@ export async function handleSubscriptionCancelled(
 
   const now = new Date().toISOString();
 
+  // Read existing metadata so we merge instead of overwriting
+  const { data: existing } = await supabase
+    .from("subscriptions")
+    .select("metadata")
+    .eq("provider", "venflow")
+    .eq("provider_customer_id", event.client.id)
+    .maybeSingle();
+
+  const existingMetadata =
+    (existing?.metadata as Record<string, unknown> | null) ?? {};
+
   const { error } = await supabase
     .from("subscriptions")
     .update({
       cancelled_at: now,
       cancel_at_period_end: true,
       metadata: {
+        ...existingMetadata,
         cancellation_reason_type: event.subscription.cancellationReason.type,
         cancellation_reason_message:
           event.subscription.cancellationReason.message ?? null,
@@ -258,7 +275,7 @@ export async function handlePaymentFailed(
     {
       subscription_id: sub.id,
       user_id: userId,
-      amount: event.payment.amount,
+      amount: Number(event.payment.amount),
       currency: "VES",
       status: "failed",
       provider: "venflow",
