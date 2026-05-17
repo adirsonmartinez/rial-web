@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-const FALLBACK_COUNT = 50_124;
+const FALLBACK_COUNT = 55_124;
 
 export function useUserCount() {
   const [count, setCount] = useState(FALLBACK_COUNT);
@@ -45,7 +45,7 @@ export function formatMilestone(count: number): string {
     return `+${m}M`;
   }
   if (count >= 1_000) {
-    const k = Math.floor(count / 10_000) * 10;
+    const k = Math.floor(count / 5_000) * 5;
     if (k === 0) return `+${Math.floor(count / 1_000)}K`;
     return `+${k}K`;
   }

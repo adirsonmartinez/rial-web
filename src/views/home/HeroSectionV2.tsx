@@ -6,9 +6,9 @@ import { useState, type MouseEvent } from "react";
 import { useUserCount, formatMilestone } from "@/views/shared/useUserCount";
 
 const STAT_AVATARS = [
-  "/founders/adirson-martinez.png",
-  "/founders/anselmo-velazco.png",
-  "/founders/inaki-umerez.png",
+  "https://api.dicebear.com/9.x/notionists/svg?seed=Valentina&backgroundColor=ACE524",
+  "https://api.dicebear.com/9.x/notionists/svg?seed=Mateo&backgroundColor=ffd5dc",
+  "https://api.dicebear.com/9.x/notionists/svg?seed=Camila&backgroundColor=c0aede",
 ];
 
 export function HeroSectionV2() {
@@ -174,8 +174,8 @@ export function HeroSectionV2() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-4">
-              <div className="flex -space-x-3">
+            <div className="flex items-center gap-5">
+              <div className="flex shrink-0 -space-x-3">
                 {STAT_AVATARS.map((src) => (
                   <Image
                     key={src}

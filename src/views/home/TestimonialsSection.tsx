@@ -1,10 +1,13 @@
+"use client";
+
 import Image from "next/image";
+import { useUserCount, formatMilestone } from "@/views/shared/useUserCount";
 
 const AVATARS = [
-  "https://i.pravatar.cc/120?img=47",
-  "https://i.pravatar.cc/120?img=12",
-  "https://i.pravatar.cc/120?img=32",
-  "https://i.pravatar.cc/120?img=68",
+  "https://api.dicebear.com/9.x/notionists/svg?seed=Sofia&backgroundColor=ACE524",
+  "https://api.dicebear.com/9.x/notionists/svg?seed=Daniel&backgroundColor=ffd5dc",
+  "https://api.dicebear.com/9.x/notionists/svg?seed=Andrea&backgroundColor=c0aede",
+  "https://api.dicebear.com/9.x/notionists/svg?seed=Luis&backgroundColor=b6e3f4",
 ];
 
 function Star({ size = 16 }: { size?: number }) {
@@ -65,7 +68,7 @@ export function TestimonialsSection() {
                 className="text-sm"
                 style={{ color: "var(--text-muted)" }}
               >
-                +35.000 reseñas
+                +400 reseñas
               </p>
             </div>
           </div>
@@ -81,6 +84,7 @@ export function TestimonialsSection() {
 }
 
 function StatCard() {
+  const count = useUserCount();
   return (
     <div
       className="flex h-full flex-col justify-between rounded-[32px] p-8 lg:p-10"
@@ -94,10 +98,10 @@ function StatCard() {
         <p
           className="font-[family-name:var(--font-sora)] text-[clamp(4rem,9vw,7rem)] font-extrabold leading-none"
         >
-          +70k
+          {formatMilestone(count)}
         </p>
         <p className="mt-6 max-w-xs text-lg leading-snug lg:text-xl">
-          Personas registrando sus finanzas cada semana en Rial.
+          Personas registrando sus finanzas en Rial.
         </p>
       </div>
       <p className="mt-10 text-sm font-semibold">
@@ -139,7 +143,7 @@ function FeaturedReview() {
       <div className="mt-auto flex items-end justify-between pt-8">
         <div className="flex items-center gap-3">
           <Image
-            src="https://i.pravatar.cc/120?img=32"
+            src="https://api.dicebear.com/9.x/lorelei/svg?seed=Valentina&backgroundColor=c0aede"
             alt="Andrea Méndez"
             width={48}
             height={48}
