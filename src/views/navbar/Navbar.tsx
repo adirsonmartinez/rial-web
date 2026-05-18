@@ -21,7 +21,7 @@ export function Navbar() {
   return (
     <header className="fixed top-4 left-0 right-0 z-50 px-4 lg:top-6">
       <nav
-        className="relative mx-auto flex h-20 w-full max-w-[1100px] items-center justify-between rounded-full px-3 pl-6 backdrop-blur-md"
+        className="relative mx-auto flex h-20 w-full max-w-[1232px] items-center justify-between rounded-full px-3 pl-6 backdrop-blur-md"
         style={{
           backgroundColor: "var(--navbar-bg)",
           border: "1px solid var(--border)",
@@ -102,7 +102,7 @@ export function Navbar() {
           }`}
         >
           <div
-            className="mx-auto flex w-full max-w-[1100px] flex-col gap-1 rounded-3xl p-2 backdrop-blur-md"
+            className="mx-auto flex w-full max-w-[1232px] flex-col gap-1 rounded-3xl p-2 backdrop-blur-md"
             style={{
               backgroundColor: "var(--navbar-bg)",
               border: "1px solid var(--border)",
