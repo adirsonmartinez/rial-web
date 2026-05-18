@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Avatar, Button, Modal } from "@heroui/react";
 import { Person, CrownDiamond, Sparkles } from "@gravity-ui/icons";
-import type { SubscriptionInfo } from "@/lib/subscription";
+import type { BillingCycle, SubscriptionInfo } from "@/lib/subscription";
 import { formatPeriodEnd } from "./PlanView";
 
 export type SettingsSectionId = "perfil" | "suscripcion";
@@ -357,6 +357,218 @@ function SupportRequestModal({
   );
 }
 
+type CadenceOption = {
+  id: BillingCycle;
+  label: string;
+  spanishLabel: string;
+  totalUsd: number;
+  monthlyEquivalent: string;
+  cadenceCopy: string;
+  badge?: string;
+};
+
+const cadenceOptions: CadenceOption[] = [
+  {
+    id: "monthly",
+    label: "Mensual",
+    spanishLabel: "mensual",
+    totalUsd: 4.99,
+    monthlyEquivalent: "$4,99 / mes",
+    cadenceCopy: "Se cobra cada mes",
+  },
+  {
+    id: "quarterly",
+    label: "Trimestral",
+    spanishLabel: "trimestral",
+    totalUsd: 13.49,
+    monthlyEquivalent: "$4,49 / mes",
+    cadenceCopy: "Se cobra cada 3 meses",
+  },
+  {
+    id: "semiannual",
+    label: "Semestral",
+    spanishLabel: "semestral",
+    totalUsd: 23.99,
+    monthlyEquivalent: "$3,99 / mes",
+    cadenceCopy: "Se cobra cada 6 meses",
+    badge: "Popular",
+  },
+  {
+    id: "yearly",
+    label: "Anual",
+    spanishLabel: "anual",
+    totalUsd: 41.99,
+    monthlyEquivalent: "$3,49 / mes",
+    cadenceCopy: "Se cobra cada año",
+    badge: "Mejor precio",
+  },
+];
+
+const formatUsd = (value: number) => `$${value.toFixed(2).replace(".", ",")}`;
+
+function buildChangePlanMailto(
+  option: CadenceOption,
+  userEmail: string,
+  currentCycle: BillingCycle | null,
+) {
+  const currentLabel =
+    cadenceOptions.find((o) => o.id === currentCycle)?.spanishLabel ??
+    "desconocido";
+  const subject = encodeURIComponent("Cambio de plan Rial Plus");
+  const body = encodeURIComponent(
+    `Hola,\n\nQuiero cambiar mi plan de Rial Plus.\n\nCorreo de la cuenta: ${userEmail}\nPlan actual: ${currentLabel}\nPlan al que quiero cambiarme: ${option.spanishLabel} (${formatUsd(option.totalUsd)} USD · ${option.cadenceCopy.toLowerCase()})\n\nGracias.`,
+  );
+  return `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
+}
+
+function PlanChangeModal({
+  isOpen,
+  onOpenChange,
+  userEmail,
+  currentCycle,
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  userEmail: string;
+  currentCycle: BillingCycle | null;
+}) {
+  return (
+    <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal.Container>
+        <Modal.Dialog className="sm:max-w-[480px]">
+          <Modal.CloseTrigger />
+          <Modal.Header>
+            <Modal.Icon
+              style={{
+                backgroundColor: "var(--accent-soft-bg)",
+                color: "var(--accent-soft-icon)",
+              }}
+            >
+              <CrownDiamond className="size-5" />
+            </Modal.Icon>
+            <Modal.Heading>Elige tu nuevo plan</Modal.Heading>
+          </Modal.Header>
+          <Modal.Body>
+            <p
+              className="mb-4 text-sm"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Selecciona la frecuencia que prefieras. Te enviaremos un correo a
+              soporte con tu solicitud y procesamos el cambio en menos de 24
+              horas.
+            </p>
+            <div className="flex flex-col gap-2">
+              {cadenceOptions.map((option) => {
+                const isCurrent = option.id === currentCycle;
+                return (
+                  <div
+                    key={option.id}
+                    className="flex items-center justify-between gap-3 rounded-xl p-3"
+                    style={{
+                      backgroundColor: isCurrent
+                        ? "var(--card-bg-subtle)"
+                        : "transparent",
+                      border: `1px solid ${isCurrent ? "var(--text-primary)" : "var(--border)"}`,
+                    }}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="text-sm font-semibold"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {option.label}
+                        </span>
+                        {isCurrent && (
+                          <span
+                            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                            style={{
+                              backgroundColor: "var(--text-primary)",
+                              color: "var(--bg-primary)",
+                            }}
+                          >
+                            Plan actual
+                          </span>
+                        )}
+                        {!isCurrent && option.badge && (
+                          <span
+                            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                            style={{
+                              backgroundColor: "var(--accent-soft-bg)",
+                              color: "var(--accent-soft-icon)",
+                            }}
+                          >
+                            {option.badge}
+                          </span>
+                        )}
+                      </div>
+                      <span
+                        className="text-xs"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        {formatUsd(option.totalUsd)} USD ·{" "}
+                        {option.monthlyEquivalent}
+                      </span>
+                    </div>
+
+                    <Button
+                      className="shrink-0"
+                      isDisabled={isCurrent}
+                      style={{
+                        backgroundColor: isCurrent
+                          ? "transparent"
+                          : "var(--text-primary)",
+                        color: isCurrent
+                          ? "var(--text-muted)"
+                          : "var(--bg-primary)",
+                        border: isCurrent
+                          ? "1px solid var(--border)"
+                          : "1px solid var(--text-primary)",
+                      }}
+                      render={(props) =>
+                        isCurrent ? (
+                          <span
+                            {...(props as unknown as React.HTMLAttributes<HTMLSpanElement>)}
+                          />
+                        ) : (
+                          <a
+                            {...(props as unknown as React.ComponentProps<"a">)}
+                            href={buildChangePlanMailto(
+                              option,
+                              userEmail,
+                              currentCycle,
+                            )}
+                            onClick={() => onOpenChange(false)}
+                          />
+                        )
+                      }
+                    >
+                      {isCurrent ? "Actual" : "Seleccionar"}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              slot="close"
+              className="w-full"
+              style={{
+                backgroundColor: "transparent",
+                color: "var(--text-primary)",
+                border: "1px solid var(--text-primary)",
+              }}
+            >
+              Volver
+            </Button>
+          </Modal.Footer>
+        </Modal.Dialog>
+      </Modal.Container>
+    </Modal.Backdrop>
+  );
+}
+
 function SubscriptionSection({
   subscription,
   userEmail,
@@ -369,6 +581,7 @@ function SubscriptionSection({
   const [supportKind, setSupportKind] = useState<SupportRequestKind | null>(
     null,
   );
+  const [isChangePlanOpen, setIsChangePlanOpen] = useState(false);
   const periodEnd = formatPeriodEnd(subscription.currentPeriodEnd);
 
   const title = isPlus
@@ -463,6 +676,49 @@ function SubscriptionSection({
           </Button>
         )}
       </div>
+
+      {isPlus && !isCancelling && (
+        <>
+          <div
+            className="h-px w-full"
+            style={{ backgroundColor: "var(--border)" }}
+          />
+
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-1">
+              <p
+                className="text-sm font-medium"
+                style={{ color: "var(--text-primary)" }}
+              >
+                Cambiar de plan
+              </p>
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+                ¿Quieres ajustar la frecuencia de tu suscripción? Te ayudamos a
+                cambiarte a mensual, trimestral, semestral o anual.
+              </p>
+            </div>
+
+            <Button
+              className="shrink-0"
+              style={{
+                backgroundColor: "transparent",
+                color: "var(--text-primary)",
+                border: "1px solid var(--text-primary)",
+              }}
+              onPress={() => setIsChangePlanOpen(true)}
+            >
+              Solicitar cambio
+            </Button>
+          </div>
+        </>
+      )}
+
+      <PlanChangeModal
+        isOpen={isChangePlanOpen}
+        onOpenChange={setIsChangePlanOpen}
+        userEmail={userEmail}
+        currentCycle={subscription.billingCycle}
+      />
 
       <SupportRequestModal
         kind={supportKind ?? "cancel"}
