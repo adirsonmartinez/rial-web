@@ -357,6 +357,113 @@ Auth: Bearer token compartido en header `Authorization`. Secret en Supabase env 
 
 Source: `supabase/functions/revenuecat-webhook/index.ts` (deployed via `supabase deploy_edge_function`).
 
+## Web app (Venflow VES): cómo está implementado
+
+Contraparte de la sección de app móvil, para el canal de pago en Bolívares vía Venflow. Implementado en la Next.js app de este repo.
+
+### Flujo de checkout end-to-end
+
+1. User selecciona cadencia en `/app/plan` y entra a `/app/checkout?cadence=mensual` (o trimestral/semestral/anual).
+2. `CheckoutView` muestra el resumen + opciones de moneda (Bolívares disponible; otras monedas marcado como “Próximamente”).
+3. Al hacer click en “Continuar”, el front hace `POST /api/venflow/checkout` con `{ cadence }`.
+4. La ruta `src/app/api/venflow/checkout/route.ts` valida cadencia + auth, llama a `createCheckoutSession()` (en `src/lib/venflow/client.ts`) contra la API de Venflow y devuelve `{ url }`.
+5. El browser redirige al checkout de Venflow. El user paga (Pago Móvil / domiciliación Bs).
+6. Venflow redirige de vuelta a `/app/checkout/result?status=success|pending|error|cancelled`.
+7. `CheckoutResultView` arranca polling sobre `users.subscription_plan` (cada 2.5 s, hasta 24 intentos = ~60 s). Cuando detecta `plan='plus' AND status IN ('active','trialing') AND (expires_at IS NULL OR expires_at > now())` cambia el status a `success` y dispara confetti (`canvas-confetti`).
+
+### Webhook receiver
+
+Endpoint: `POST /api/venflow/webhooks` — `src/app/api/venflow/webhooks/route.ts`.
+
+Auth: el header `x-webhook-secret` debe coincidir con `process.env.VENFLOW_WEBHOOK_SECRET`. Si no, responde 401. Si falta la env var, responde 500.
+
+| Evento Venflow | Handler | Acción en Supabase |
+|---|---|---|
+| `USER_CREATE_EVENT` | log only | No-op (informativo). |
+| `SUBSCRIPTION_CREATE_EVENT` | `handleSubscriptionCreate` | UPDATE `provider_subscription_id`, `provider_product_id` sobre la sub existente. Si todavía no existe (PAYMENT_SUCCESS no llegó), skipea con `console.warn` sin lanzar. |
+| `PAYMENT_SUCCESS_EVENT` | `handlePaymentSuccess` | UPSERT en `subscriptions` con `status='active'`, `current_period_end`, `expires_at`. Preserva `started_at` si la fila ya existía, mergea `metadata`. Luego INSERT en `subscription_payments`. |
+| `PAYMENT_FAILED_EVENT` | `handlePaymentFailed` | UPDATE `status='past_due'` sobre la sub. |
+| `INVOICE_CREATE_EVENT` | `handleInvoiceCreate` | Guarda `last_invoice_id` y `last_invoice_status` en `subscriptions.metadata`. Si la sub no existe aún, skipea con warning. |
+| `INVOICE_UPDATE_EVENT` | `handleInvoiceUpdate` | Mismo storage en metadata + back-fill de `provider_invoice_id` sobre el `subscription_payments` más reciente que aún no lo tenga. |
+| `SUBSCRIPTION_CANCELLED_EVENT` | `handleSubscriptionCancelled` | UPDATE `cancel_at_period_end=true`, `cancelled_at=now()`. **No** cambia `status` (sigue `active` hasta que el cron lo expire). |
+
+Implementación: `src/lib/venflow/webhooks.ts`. Tipos de eventos: `src/lib/venflow/types.ts`. Todos los handlers usan el admin client (`src/lib/supabase/admin.ts`) para bypassear RLS.
+
+Ningún handler escribe en `users` directamente — el trigger `sync_user_subscription` propaga.
+
+### Orden de eventos no determinista
+
+Venflow no garantiza un orden lógico de entrega. Patrón observado en producción:
+
+1. `INVOICE_CREATE_EVENT` llega primero, antes que `PAYMENT_SUCCESS_EVENT`.
+2. `SUBSCRIPTION_CREATE_EVENT` puede llegar antes o después de `PAYMENT_SUCCESS_EVENT`.
+3. `PAYMENT_SUCCESS_EVENT` es el único que crea la fila en `subscriptions` (vía UPSERT).
+4. `INVOICE_UPDATE_EVENT` llega al final y completa los datos faltantes.
+
+Para soportar esto los handlers son tolerantes:
+
+- Si una dependencia (la sub o el payment) no existe todavía, **no fallan** — loguean y retornan.
+- Eventos posteriores (especialmente `INVOICE_UPDATE`) hacen back-fill de los IDs que no estaban disponibles al momento del primer evento.
+
+Esto implica que cualquier consumidor que observe el estado **debe esperar a que llegue `PAYMENT_SUCCESS`** antes de considerar la sub válida — los otros eventos solos no garantizan acceso.
+
+### Polling post-checkout (UX)
+
+Como los webhooks pueden tardar varios segundos (vimos hasta ~15 s en pruebas), la página de resultado del checkout (`/app/checkout/result?status=pending|success`) corre un polling en cliente en lugar de mostrar un estado final cerrado. El usuario ve un estado “en proceso” y la pantalla pasa a `success` + confetti automáticamente cuando el trigger `sync_user_subscription` ya actualizó `users`. Si supera el timeout (60 s) deja el estado pending y el user puede simplemente refrescar.
+
+### Gestión post-venta (cancelar, reactivar, cambiar plan)
+
+La web **no expone** APIs públicas para que el user opere sobre su suscripción. El flujo actual es manual asistido:
+
+- **User Plus** en el modal de configuración → tab Suscripción ve los botones:
+  - **Cancelar suscripción** / **Solicitar reactivación** (según `cancel_at_period_end`).
+  - **Solicitar cambio de plan** abre un modal con las 4 cadencias, marca la actual y al seleccionar otra dispara un `mailto:` con el plan elegido pre-llenado.
+- Todos los botones terminan en un `mailto:` a `soporte@somosrial.com` con asunto y body ya redactados.
+- **Admin** procesa la solicitud desde el módulo `/admin/clientes/[id]`, que llama a:
+  - `POST /api/admin/subscription/cancel` → setea `cancel_at_period_end=true`, `cancelled_at=now()`, mergea metadata con `admin_action: { type: 'cancel', at }`. **No** cambia `status` ni toca Venflow (la cancelación real en Venflow se hace fuera, vía dashboard de Venflow o soporte).
+  - `POST /api/admin/subscription/reactivate` → revierte el flag.
+
+Ninguna de estas rutas toca `users` directamente: confían en el trigger.
+
+### Cron de expiración
+
+Endpoint: `GET /api/cron/expire-subscriptions` (`src/app/api/cron/expire-subscriptions/route.ts`), invocado por Vercel Cron diariamente a las **00:05 UTC** (ver `vercel.json`).
+
+Auth: header `Authorization: Bearer ${CRON_SECRET}`.
+
+Lógica: busca filas `subscriptions` con `provider='venflow'`, `status='active'`, `cancel_at_period_end=true` y `current_period_end <= now()`, y las marca como `status='expired'`. El trigger propaga a `users`.
+
+Esto convive con `expire_overdue_subscriptions()` (pg_cron, descrito en la sección de mobile más abajo): ambos cubren el mismo gap pero con criterios ligeramente distintos. El cron de Vercel solo expira lo que ya estaba marcado para cancelar; la función SQL es defensiva y captura cualquier sub vencida sin marca, en cualquier provider.
+
+### Variables de entorno
+
+| Var | Uso |
+|-----|-----|
+| `VENFLOW_API_KEY` | Auth contra la API de Venflow al crear sessions de checkout. |
+| `VENFLOW_WEBHOOK_SECRET` | Verificación del header `x-webhook-secret` en webhooks entrantes. |
+| `VENFLOW_CHECKOUT_URL_BASE` | Base URL del checkout de Venflow al que se redirige. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Bypass RLS en `createAdminClient()` para todas las rutas server-side. |
+| `CRON_SECRET` | Bearer token que Vercel Cron envía al endpoint de expiración. |
+
+### Mapa de archivos
+
+```
+src/app/api/venflow/checkout/route.ts              # POST → crea session en Venflow
+src/app/api/venflow/webhooks/route.ts              # POST → router de eventos
+src/lib/venflow/client.ts                          # cliente HTTP contra Venflow API
+src/lib/venflow/webhooks.ts                        # handlers (1 por evento)
+src/lib/venflow/types.ts                           # tipos de eventos
+src/lib/venflow/plans.ts                           # mapping cadence ↔ plan_id Venflow
+src/views/dashboard/PlanView.tsx                   # tabla de planes en /app/plan
+src/views/dashboard/CheckoutView.tsx               # UI de selección cadencia + moneda
+src/views/dashboard/CheckoutResultView.tsx         # status page con polling + confetti
+src/views/dashboard/SettingsModal.tsx              # gestión post-venta vía mailto
+src/app/api/admin/subscription/cancel/route.ts     # admin: cancelar (cancel_at_period_end)
+src/app/api/admin/subscription/reactivate/route.ts # admin: reactivar
+src/app/api/cron/expire-subscriptions/route.ts     # cron: marcar expired
+vercel.json                                        # schedule del cron
+```
+
 ## Lecciones del testing end-to-end
 
 Durante las pruebas con sandbox de Apple (subscriber `tuxedo@revenuecat.com`) verificamos el ciclo completo *purchase → cancel → expiration*. Hallazgos importantes para cualquier consumidor del sistema:
