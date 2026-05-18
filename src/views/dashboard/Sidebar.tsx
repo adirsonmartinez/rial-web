@@ -32,6 +32,11 @@ import {
 } from "@gravity-ui/icons";
 import { createClient } from "@/lib/supabase/client";
 import type { SubscriptionInfo } from "@/lib/subscription";
+import {
+  AVATAR_BG_CSS,
+  resolveAvatarSrc,
+  type LoreleiAvatarOptions,
+} from "@/lib/avatar";
 import { SettingsModal, type SettingsSectionId } from "./SettingsModal";
 
 type NavItem = {
@@ -95,10 +100,18 @@ function NavRow({
 type SidebarProps = {
   userEmail: string;
   userName: string;
+  avatarUrl: string | null;
+  avatarOptions: LoreleiAvatarOptions | null;
   subscription: SubscriptionInfo;
 };
 
-export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
+export function Sidebar({
+  userEmail,
+  userName,
+  avatarUrl,
+  avatarOptions,
+  subscription,
+}: SidebarProps) {
   const isPlus = subscription.plan === "plus";
   const pathname = usePathname();
   const router = useRouter();
@@ -120,6 +133,7 @@ export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
   };
 
   const initial = (userName || userEmail || "?").trim().charAt(0).toUpperCase();
+  const avatarSrc = resolveAvatarSrc(avatarUrl, avatarOptions);
 
   return (
     <aside
@@ -184,11 +198,18 @@ export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
         >
           <div className="relative shrink-0">
             <Avatar size="md">
+              {avatarSrc && (
+                <Avatar.Image
+                  src={avatarSrc}
+                  alt={userName}
+                  className="h-full w-full rounded-full object-cover"
+                />
+              )}
               <Avatar.Fallback>
                 <span
                   className="flex h-full w-full items-center justify-center rounded-full text-sm font-semibold"
                   style={{
-                    backgroundColor: "var(--accent-soft-bg)",
+                    backgroundColor: AVATAR_BG_CSS,
                     color: "var(--accent-soft-icon)",
                   }}
                 >
@@ -326,6 +347,8 @@ export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
         subscription={subscription}
         userEmail={userEmail}
         userName={userName}
+        avatarUrl={avatarUrl}
+        avatarOptions={avatarOptions}
       />
     </aside>
   );

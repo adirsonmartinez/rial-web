@@ -5,6 +5,11 @@ import Link from "next/link";
 import { Avatar, Button, Modal } from "@heroui/react";
 import { Person, CrownDiamond, Sparkles } from "@gravity-ui/icons";
 import type { BillingCycle, SubscriptionInfo } from "@/lib/subscription";
+import {
+  AVATAR_BG_CSS,
+  resolveAvatarSrc,
+  type LoreleiAvatarOptions,
+} from "@/lib/avatar";
 import { formatPeriodEnd } from "./PlanView";
 
 export type SettingsSectionId = "perfil" | "suscripcion";
@@ -114,10 +119,14 @@ function OutlineButton({
 function ProfileSection({
   userName,
   userEmail,
+  avatarUrl,
+  avatarOptions,
   onComingSoon,
 }: {
   userName: string;
   userEmail: string;
+  avatarUrl: string | null;
+  avatarOptions: LoreleiAvatarOptions | null;
   onComingSoon: (label: string) => void;
 }) {
   const initial = (userName || userEmail || "?")
@@ -125,6 +134,7 @@ function ProfileSection({
     .charAt(0)
     .toUpperCase();
   const username = userEmail.split("@")[0] || userName;
+  const avatarSrc = resolveAvatarSrc(avatarUrl, avatarOptions);
 
   return (
     <div className="flex flex-col gap-6">
@@ -146,11 +156,18 @@ function ProfileSection({
           label={
             <div className="flex items-center gap-3">
               <Avatar size="md">
+                {avatarSrc && (
+                  <Avatar.Image
+                    src={avatarSrc}
+                    alt={userName}
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                )}
                 <Avatar.Fallback>
                   <span
                     className="flex h-full w-full items-center justify-center rounded-full text-sm font-semibold"
                     style={{
-                      backgroundColor: "var(--accent-soft-bg)",
+                      backgroundColor: AVATAR_BG_CSS,
                       color: "var(--accent-soft-icon)",
                     }}
                   >
@@ -700,6 +717,8 @@ type SettingsModalProps = {
   subscription: SubscriptionInfo;
   userEmail: string;
   userName: string;
+  avatarUrl: string | null;
+  avatarOptions: LoreleiAvatarOptions | null;
 };
 
 export function SettingsModal({
@@ -709,6 +728,8 @@ export function SettingsModal({
   subscription,
   userEmail,
   userName,
+  avatarUrl,
+  avatarOptions,
 }: SettingsModalProps) {
   const [active, setActive] = useState<SectionId>(initialSection);
   const [comingSoonLabel, setComingSoonLabel] = useState<string | null>(null);
@@ -729,6 +750,8 @@ export function SettingsModal({
                 <ProfileSection
                   userName={userName}
                   userEmail={userEmail}
+                  avatarUrl={avatarUrl}
+                  avatarOptions={avatarOptions}
                   onComingSoon={setComingSoonLabel}
                 />
               )}
