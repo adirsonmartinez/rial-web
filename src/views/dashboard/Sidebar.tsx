@@ -132,7 +132,7 @@ export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
     >
       <Link
         href="/app"
-        className="mb-6 inline-flex items-center px-2 no-underline"
+        className="mb-6 inline-flex items-center gap-2 px-2 no-underline"
         aria-label="Rial"
       >
         <Image
@@ -151,6 +151,13 @@ export function Sidebar({ userEmail, userName, subscription }: SidebarProps) {
           className="hidden h-auto dark:block"
           priority
         />
+        {process.env.NODE_ENV !== "production" && (
+          <span
+            className="rounded-md bg-[var(--accent-soft-icon)] px-1.5 py-0.5 text-[10px] font-semibold uppercase leading-none tracking-wide text-white dark:bg-[var(--accent-soft-bg)] dark:text-[var(--accent-soft-icon)]"
+          >
+            Beta
+          </span>
+        )}
       </Link>
 
       <nav className="flex flex-col gap-1">
