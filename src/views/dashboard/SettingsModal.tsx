@@ -105,15 +105,7 @@ function OutlineButton({
   children: React.ReactNode;
 }) {
   return (
-    <Button
-      className="shrink-0"
-      style={{
-        backgroundColor: "transparent",
-        color: "var(--text-primary)",
-        border: "1px solid var(--text-primary)",
-      }}
-      onPress={onPress}
-    >
+    <Button variant="secondary" className="shrink-0" onPress={onPress}>
       {children}
     </Button>
   );
@@ -328,15 +320,7 @@ function SupportRequestModal({
             </p>
           </Modal.Body>
           <Modal.Footer>
-            <Button
-              slot="close"
-              className="flex-1"
-              style={{
-                backgroundColor: "transparent",
-                color: "var(--text-primary)",
-                border: "1px solid var(--text-primary)",
-              }}
-            >
+            <Button slot="close" variant="secondary" className="flex-1">
               Volver
             </Button>
             <Button
@@ -511,26 +495,18 @@ function PlanChangeModal({
                       </span>
                     </div>
 
-                    <Button
-                      className="shrink-0"
-                      isDisabled={isCurrent}
-                      style={{
-                        backgroundColor: isCurrent
-                          ? "transparent"
-                          : "var(--text-primary)",
-                        color: isCurrent
-                          ? "var(--text-muted)"
-                          : "var(--bg-primary)",
-                        border: isCurrent
-                          ? "1px solid var(--border)"
-                          : "1px solid var(--text-primary)",
-                      }}
-                      render={(props) =>
-                        isCurrent ? (
-                          <span
-                            {...(props as unknown as React.HTMLAttributes<HTMLSpanElement>)}
-                          />
-                        ) : (
+                    {isCurrent ? (
+                      <Button
+                        variant="secondary"
+                        className="shrink-0"
+                        isDisabled
+                      >
+                        Actual
+                      </Button>
+                    ) : (
+                      <Button
+                        className="shrink-0"
+                        render={(props) => (
                           <a
                             {...(props as unknown as React.ComponentProps<"a">)}
                             href={buildChangePlanMailto(
@@ -540,26 +516,18 @@ function PlanChangeModal({
                             )}
                             onClick={() => onOpenChange(false)}
                           />
-                        )
-                      }
-                    >
-                      {isCurrent ? "Actual" : "Seleccionar"}
-                    </Button>
+                        )}
+                      >
+                        Seleccionar
+                      </Button>
+                    )}
                   </div>
                 );
               })}
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button
-              slot="close"
-              className="w-full"
-              style={{
-                backgroundColor: "transparent",
-                color: "var(--text-primary)",
-                border: "1px solid var(--text-primary)",
-              }}
-            >
+            <Button slot="close" variant="secondary" className="w-full">
               Volver
             </Button>
           </Modal.Footer>
@@ -649,12 +617,8 @@ function SubscriptionSection({
 
         {isPlus ? (
           <Button
+            variant="secondary"
             className="shrink-0"
-            style={{
-              backgroundColor: "transparent",
-              color: "var(--text-primary)",
-              border: "1px solid var(--text-primary)",
-            }}
             onPress={() =>
               setSupportKind(isCancelling ? "reactivate" : "cancel")
             }
@@ -699,12 +663,8 @@ function SubscriptionSection({
             </div>
 
             <Button
+              variant="secondary"
               className="shrink-0"
-              style={{
-                backgroundColor: "transparent",
-                color: "var(--text-primary)",
-                border: "1px solid var(--text-primary)",
-              }}
               onPress={() => setIsChangePlanOpen(true)}
             >
               Solicitar cambio
