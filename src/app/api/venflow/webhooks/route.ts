@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   handleInvoiceCreate,
+  handleInvoiceUpdate,
   handlePaymentFailed,
   handlePaymentSuccess,
   handleSubscriptionCancelled,
@@ -54,11 +55,13 @@ export async function POST(request: NextRequest) {
       case "INVOICE_CREATE_EVENT":
         await handleInvoiceCreate(event, supabase);
         break;
+      case "INVOICE_UPDATE_EVENT":
+        await handleInvoiceUpdate(event, supabase);
+        break;
       case "PAYMENT_FAILED_EVENT":
         await handlePaymentFailed(event, supabase);
         break;
       case "USER_CREATE_EVENT":
-      case "INVOICE_UPDATE_EVENT":
         console.log("[venflow webhook] info event received:", event.eventType);
         break;
       default: {
