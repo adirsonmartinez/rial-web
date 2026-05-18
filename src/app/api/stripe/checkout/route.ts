@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   const stripe = getStripeClient();
 
   try {
-    // Reuse customer if the user already has a Stripe subscription row
+    // 1. Reuse customer if the user already completed a Stripe checkout
     const { data: existing } = await admin
       .from("subscriptions")
       .select("provider_customer_id")
@@ -57,6 +57,20 @@ export async function POST(request: NextRequest) {
     let customerId =
       (existing?.provider_customer_id as string | null | undefined) ?? null;
 
+    // 2. Else: look in Stripe for an orphan customer (previous abandoned
+    //    checkout) by email + metadata.user_id to avoid creating duplicates.
+    if (!customerId && user.email) {
+      const found = await stripe.customers.list({
+        email: user.email,
+        limit: 10,
+      });
+      const match = found.data.find(
+        (c) => c.metadata?.user_id === user.id && !c.deleted,
+      );
+      if (match) customerId = match.id;
+    }
+
+    // 3. Otherwise create a fresh one.
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email ?? undefined,

@@ -203,6 +203,83 @@ export async function handleCheckoutSessionCompleted(
     console.error("[stripe] checkout.session.completed upsert failed", error);
     throw error;
   }
+
+  // Record the first payment here (instead of waiting for invoice.paid)
+  // because Stripe may deliver invoice.paid BEFORE this handler finishes,
+  // causing the invoice.paid handler to skip with a "subscription not found"
+  // warning. Doing it here guarantees the payment is recorded.
+  const invoiceId =
+    typeof session.invoice === "string"
+      ? session.invoice
+      : session.invoice?.id;
+  if (invoiceId) {
+    try {
+      const invoice = await getStripeClient().invoices.retrieve(invoiceId);
+      await insertPaymentRowIfMissing(
+        supabase,
+        userId,
+        customerId,
+        invoice,
+        event.id,
+      );
+    } catch (err) {
+      console.warn(
+        "[stripe] failed to record initial invoice payment",
+        err,
+      );
+    }
+  }
+}
+
+async function insertPaymentRowIfMissing(
+  supabase: AdminSupabaseClient,
+  userId: string,
+  customerId: string,
+  invoice: Stripe.Invoice,
+  eventId: string,
+): Promise<void> {
+  // Idempotency: skip if we already recorded this invoice.
+  const { data: existingPayment } = await supabase
+    .from("subscription_payments")
+    .select("id")
+    .eq("provider", "stripe")
+    .eq("provider_invoice_id", invoice.id)
+    .maybeSingle();
+  if (existingPayment) return;
+
+  const { data: sub } = await supabase
+    .from("subscriptions")
+    .select("id")
+    .eq("provider", "stripe")
+    .eq("provider_customer_id", customerId)
+    .maybeSingle();
+  if (!sub) return;
+
+  const amount = (invoice.amount_paid ?? 0) / 100;
+  const currency = (invoice.currency ?? "usd").toUpperCase();
+
+  const { error } = await supabase.from("subscription_payments").insert({
+    subscription_id: sub.id as string,
+    user_id: userId,
+    amount,
+    currency,
+    status: "succeeded",
+    provider: "stripe",
+    provider_payment_id: invoice.id,
+    provider_invoice_id: invoice.id,
+    paid_at:
+      unixToIso(invoice.status_transitions?.paid_at) ?? nowIso(),
+    metadata: {
+      hosted_invoice_url: invoice.hosted_invoice_url,
+      number: invoice.number,
+      last_event_id: eventId,
+    },
+  });
+
+  if (error) {
+    console.error("[stripe] subscription_payments insert failed", error);
+    throw error;
+  }
 }
 
 export async function handleSubscriptionUpdated(
@@ -300,46 +377,30 @@ export async function handleInvoicePaid(
 
   const { data: existing } = await supabase
     .from("subscriptions")
-    .select("id, user_id")
+    .select("user_id")
     .eq("provider", "stripe")
     .eq("provider_customer_id", customerId)
     .maybeSingle();
 
+  // If the subscription row doesn't exist yet (race with
+  // checkout.session.completed), skip. The session handler will record the
+  // first invoice payment itself, and subsequent renewals will re-fire
+  // invoice.paid with the row already in place.
   if (!existing) {
-    console.warn("[stripe] invoice.paid: subscription not found", {
-      customer_id: customerId,
-      invoice_id: invoice.id,
-    });
+    console.warn(
+      "[stripe] invoice.paid: subscription not found yet, will be recorded by session handler",
+      { customer_id: customerId, invoice_id: invoice.id },
+    );
     return;
   }
 
-  const subscriptionId = existing.id as string;
-  const userId = existing.user_id as string;
-  const amount = (invoice.amount_paid ?? 0) / 100;
-  const currency = (invoice.currency ?? "usd").toUpperCase();
-
-  const { error } = await supabase.from("subscription_payments").insert({
-    subscription_id: subscriptionId,
-    user_id: userId,
-    amount,
-    currency,
-    status: "succeeded",
-    provider: "stripe",
-    provider_payment_id: invoice.id,
-    provider_invoice_id: invoice.id,
-    paid_at:
-      unixToIso(invoice.status_transitions?.paid_at) ?? nowIso(),
-    metadata: {
-      hosted_invoice_url: invoice.hosted_invoice_url,
-      number: invoice.number,
-      last_event_id: event.id,
-    },
-  });
-
-  if (error) {
-    console.error("[stripe] invoice.paid insert failed", error);
-    throw error;
-  }
+  await insertPaymentRowIfMissing(
+    supabase,
+    existing.user_id as string,
+    customerId,
+    invoice,
+    event.id,
+  );
 }
 
 export async function handleInvoicePaymentFailed(

@@ -7,9 +7,7 @@ import { Button } from "@heroui/react";
 import {
   ArrowLeft,
   Check,
-  CircleDollar,
   CrownDiamond,
-  Globe,
   ShieldCheck,
 } from "@gravity-ui/icons";
 
@@ -67,7 +65,7 @@ type PaymentCurrencyOption = {
   id: PaymentCurrencyId;
   name: string;
   description: string;
-  icon: typeof CircleDollar;
+  iconSrc: string;
   badge?: string;
   disabled?: boolean;
 };
@@ -78,7 +76,7 @@ const paymentCurrencies: PaymentCurrencyOption[] = [
     name: "Suscribirse con Bolívares",
     description:
       "Domiciliación con tu cuenta bancaria local. Cancela cuando quieras.",
-    icon: CircleDollar,
+    iconSrc: "/currencyIcons/VES_icon.png",
     badge: "Recomendado",
   },
   {
@@ -86,7 +84,7 @@ const paymentCurrencies: PaymentCurrencyOption[] = [
     name: "Suscribirse con otra moneda",
     description:
       "Paga en USD desde cualquier país con tarjeta internacional.",
-    icon: Globe,
+    iconSrc: "/currencyIcons/USD_icon.png",
   },
 ];
 
@@ -102,7 +100,6 @@ function PaymentCurrencyCard({
   isSelected: boolean;
   onSelect: () => void;
 }) {
-  const Icon = option.icon;
   return (
     <button
       type="button"
@@ -110,28 +107,21 @@ function PaymentCurrencyCard({
       aria-pressed={isSelected}
       aria-disabled={option.disabled}
       disabled={option.disabled}
-      className={`flex w-full items-start gap-4 rounded-2xl p-5 text-left transition-colors ${
+      className={`flex w-full items-start gap-4 rounded-[20px] p-5 text-left transition-colors ${
         option.disabled ? "cursor-not-allowed opacity-60" : ""
       }`}
       style={{
-        backgroundColor: isSelected
-          ? "var(--accent-soft-bg)"
-          : "var(--bg-card)",
-        border: `1.5px solid ${isSelected ? "var(--accent-soft-icon)" : "var(--border)"}`,
+        backgroundColor: "var(--card-bg-subtle)",
       }}
     >
-      <span
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-        style={{
-          backgroundColor: isSelected
-            ? "var(--accent-soft-bg)"
-            : "var(--card-bg-subtle)",
-          color: isSelected
-            ? "var(--accent-soft-icon)"
-            : "var(--text-primary)",
-        }}
-      >
-        <Icon width={18} height={18} />
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full">
+        <Image
+          src={option.iconSrc}
+          alt=""
+          width={40}
+          height={40}
+          className="h-10 w-10 object-cover"
+        />
       </span>
 
       <div className="flex flex-1 flex-col gap-1">
@@ -162,8 +152,10 @@ function PaymentCurrencyCard({
       <span
         className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${isSelected ? "text-white dark:text-black" : ""}`}
         style={{
-          backgroundColor: isSelected ? "var(--accent-soft-icon)" : "transparent",
-          border: `1.5px solid ${isSelected ? "var(--accent-soft-icon)" : "var(--border)"}`,
+          backgroundColor: isSelected
+            ? "var(--text-primary)"
+            : "transparent",
+          border: `1.5px solid ${isSelected ? "var(--text-primary)" : "var(--border)"}`,
         }}
       >
         {isSelected && <Check width={12} height={12} />}
@@ -394,6 +386,35 @@ export function CheckoutView({ cadence }: { cadence: Cadence }) {
                   height={16}
                   className="hidden h-auto dark:block"
                 />
+              </a>
+            </div>
+          )}
+
+          {selectedCurrency === "otra" && (
+            <div
+              className="flex items-center justify-center gap-1.5 text-xs"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <span>Powered by</span>
+              <a
+                href="https://stripe.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center opacity-60 transition-opacity hover:opacity-90"
+                aria-label="Stripe"
+              >
+                <span
+                  style={{
+                    fontFamily:
+                      "Helvetica, 'Helvetica Neue', Arial, sans-serif",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                    letterSpacing: "-0.04em",
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  stripe
+                </span>
               </a>
             </div>
           )}
