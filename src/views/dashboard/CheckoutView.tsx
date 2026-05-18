@@ -87,8 +87,6 @@ const paymentCurrencies: PaymentCurrencyOption[] = [
     description:
       "Paga en USD desde cualquier país con tarjeta internacional.",
     icon: Globe,
-    badge: "Próximamente",
-    disabled: true,
   },
 ];
 
@@ -182,15 +180,20 @@ export function CheckoutView({ cadence }: { cadence: Cadence }) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const subtotal = pricing.totalUsd;
-  const taxRate = 0.16;
+  const appliesIva = selectedCurrency === "bolivares";
+  const taxRate = appliesIva ? 0.16 : 0;
   const tax = +(subtotal * taxRate).toFixed(2);
   const total = +(subtotal + tax).toFixed(2);
 
   async function handleContinue() {
     setIsSubmitting(true);
     setErrorMessage(null);
+    const endpoint =
+      selectedCurrency === "bolivares"
+        ? "/api/venflow/checkout"
+        : "/api/stripe/checkout";
     try {
-      const res = await fetch("/api/venflow/checkout", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cadence }),
@@ -279,11 +282,13 @@ export function CheckoutView({ cadence }: { cadence: Cadence }) {
               label={`Plan Plus · ${pricing.label}`}
               value={formatUsd(subtotal)}
             />
-            <SummaryRow
-              label="IVA (16%)"
-              value={formatUsd(tax)}
-              muted
-            />
+            {appliesIva && (
+              <SummaryRow
+                label="IVA (16%)"
+                value={formatUsd(tax)}
+                muted
+              />
+            )}
           </div>
 
           <div

@@ -464,6 +464,104 @@ src/app/api/cron/expire-subscriptions/route.ts     # cron: marcar expired
 vercel.json                                        # schedule del cron
 ```
 
+## Web app (Stripe USD): cómo está implementado
+
+Canal paralelo a Venflow, para pagos internacionales en USD con tarjeta. Comparte la misma capa de datos (`subscriptions` con `provider='stripe'`) y la misma UI de checkout/result, solo cambia el provider al que se llama.
+
+### Flujo de checkout
+
+1. En `/app/checkout` el user elige la opción **"Suscribirse con otra moneda"**.
+2. Click en "Continuar" → `POST /api/stripe/checkout` con `{ cadence }`.
+3. La ruta `src/app/api/stripe/checkout/route.ts`:
+   - Valida cadencia + auth.
+   - Reusa el `provider_customer_id` si el user ya tiene una sub en Stripe; si no, crea un **Stripe Customer** con `metadata.user_id` apuntando a Supabase.
+   - Crea un **Checkout Session** en modo `subscription` con `allow_promotion_codes: true`, `client_reference_id = user.id`, success/cancel URLs hacia `/app/checkout/result`.
+   - Devuelve `{ url }` del checkout.
+4. Browser redirige a `checkout.stripe.com`. El user paga con tarjeta (Apple/Google Pay también soportados).
+5. Stripe redirige a `/app/checkout/result?status=success|cancelled`. El polling del `CheckoutResultView` espera a que el trigger `sync_user_subscription` propague `users.subscription_plan='plus'` (mismo polling que para Venflow) y dispara confetti.
+
+### Webhook receiver
+
+Endpoint: `POST /api/stripe/webhooks` — `src/app/api/stripe/webhooks/route.ts`.
+
+Auth: signature criptográfica vía `stripe.webhooks.constructEvent()` contra `STRIPE_WEBHOOK_SECRET`. Si falla, 400. Si falta la env var, 500.
+
+| Evento Stripe | Handler | Acción |
+|---|---|---|
+| `checkout.session.completed` | `handleCheckoutSessionCompleted` | UPSERT en `subscriptions` con `status='active'`, dates, `provider_customer_id`, `provider_subscription_id`, `provider_product_id=price.id`. Es el único evento que crea la fila. |
+| `customer.subscription.updated` | `handleSubscriptionUpdated` | Sync de `status`, `billing_cycle`, `cancel_at_period_end`, `cancelled_at`, dates, `provider_product_id` (en caso de plan change). |
+| `customer.subscription.deleted` | `handleSubscriptionDeleted` | `status='expired'`, `cancel_at_period_end=false`. |
+| `invoice.paid` | `handleInvoicePaid` | INSERT en `subscription_payments` con `amount`, `currency`, `provider_invoice_id`, `hosted_invoice_url`. |
+| `invoice.payment_failed` | `handleInvoicePaymentFailed` | `status='past_due'`. |
+
+Implementación: `src/lib/stripe/webhooks.ts`. Cliente: `src/lib/stripe/client.ts`. Mapping cadence ↔ price ID: `src/lib/stripe/plans.ts`.
+
+A diferencia de Venflow, Stripe entrega eventos en orden lógico: `checkout.session.completed` siempre llega primero. Esto simplifica los handlers — no necesitamos los patrones tolerantes a out-of-order de Venflow.
+
+Nota sobre el SDK: Stripe v22 movió `current_period_start/end` desde el nivel `Subscription` a `subscription.items.data[0]`. Helpers `getPeriodStart()` / `getPeriodEnd()` encapsulan este lookup.
+
+### Gestión post-venta: Customer Portal
+
+Los usuarios con `provider='stripe'` no usan el flujo mailto del SettingsModal. En su lugar, el modal muestra un único botón **"Administrar suscripción"** que:
+
+1. Llama a `POST /api/stripe/portal` (`src/app/api/stripe/portal/route.ts`).
+2. La ruta crea un **Billing Portal Session** para el customer del user y devuelve `{ url }`.
+3. El user es redirigido al portal hosted de Stripe donde puede:
+   - Cancelar la suscripción (queda con `cancel_at_period_end=true` hasta el período).
+   - Cambiar de plan entre las 4 cadencias (Stripe gestiona el prorrateo).
+   - Actualizar método de pago.
+   - Descargar facturas (PDF).
+
+Todos los cambios disparan `customer.subscription.updated` y se reflejan automáticamente en `subscriptions`.
+
+**Configuración requerida** en Stripe Dashboard → Settings → Billing → Customer portal:
+- Habilitar "Cancel subscriptions".
+- Habilitar "Switch plans" con las 4 prices.
+- Habilitar "Update payment method".
+- Habilitar "View invoice history".
+
+### Promo codes / cupones
+
+El campo "Add promotion code" aparece automáticamente en el Checkout cuando `allow_promotion_codes: true` está habilitado en la session (ya lo está en nuestro código). Los cupones se crean desde Stripe Dashboard → Products → Coupons → "Create promotion code". No requiere cambios de código para usarlos.
+
+### Variables de entorno
+
+| Var | Uso |
+|-----|-----|
+| `STRIPE_SECRET_KEY` | Auth contra la API de Stripe (server-side). `sk_test_*` en sandbox, `sk_live_*` en prod. |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret para verificar webhooks. Único por endpoint, configurado en Stripe Dashboard → Developers → Webhooks. |
+| `STRIPE_PRICE_MONTHLY` | Price ID en Stripe para la cadencia mensual (`price_*`). |
+| `STRIPE_PRICE_QUARTERLY` | Price ID trimestral. |
+| `STRIPE_PRICE_SEMIANNUAL` | Price ID semestral. |
+| `STRIPE_PRICE_YEARLY` | Price ID anual. |
+
+Los precios USD de cada cadencia (4.99 / 13.49 / 23.99 / 41.99) viven en Stripe, no en código — el frontend solo muestra los valores hardcodeados en `CheckoutView`/`PlanView`. Si cambian los precios en Stripe, actualizar también el `cadenceCatalog` del front.
+
+### Mapa de archivos
+
+```
+src/lib/stripe/client.ts                       # SDK instance (cached)
+src/lib/stripe/plans.ts                        # mapping Cadence ↔ STRIPE_PRICE_*
+src/lib/stripe/types.ts                        # tipos angostos para eventos
+src/lib/stripe/webhooks.ts                     # handlers (5 eventos)
+src/app/api/stripe/checkout/route.ts           # POST → Checkout Session
+src/app/api/stripe/webhooks/route.ts           # POST → signature + router
+src/app/api/stripe/portal/route.ts             # POST → Billing Portal Session
+src/views/dashboard/CheckoutView.tsx           # branch venflow/stripe según moneda
+src/views/dashboard/SettingsModal.tsx          # "Administrar suscripción" → portal
+```
+
+### Diferencias con Venflow
+
+| Aspecto | Venflow | Stripe |
+|---------|---------|--------|
+| Moneda | VES | USD |
+| Auth de webhook | Header `x-webhook-secret` plain | Signature criptográfica HMAC-SHA256 |
+| Orden de eventos | No determinista (handlers tolerantes) | Determinista |
+| IVA | 16% aplicado en el front | No aplicado (precios sin tax) |
+| Gestión post-venta | Mailto a soporte → admin opera vía `/admin/clientes/[id]` | Self-service vía Customer Portal |
+| Cron de expiración | Vercel Cron sobre `/api/cron/expire-subscriptions` | `customer.subscription.deleted` lo gestiona en tiempo real |
+
 ## Lecciones del testing end-to-end
 
 Durante las pruebas con sandbox de Apple (subscriber `tuxedo@revenuecat.com`) verificamos el ciclo completo *purchase → cancel → expiration*. Hallazgos importantes para cualquier consumidor del sistema:

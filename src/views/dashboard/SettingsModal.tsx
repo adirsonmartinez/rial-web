@@ -563,11 +563,32 @@ function SubscriptionSection({
 }) {
   const isPlus = subscription.plan === "plus";
   const isCancelling = isPlus && subscription.cancelAtPeriodEnd;
+  const isStripe = subscription.provider === "stripe";
   const [supportKind, setSupportKind] = useState<SupportRequestKind | null>(
     null,
   );
   const [isChangePlanOpen, setIsChangePlanOpen] = useState(false);
+  const [isOpeningPortal, setIsOpeningPortal] = useState(false);
+  const [portalError, setPortalError] = useState<string | null>(null);
   const periodEnd = formatPeriodEnd(subscription.currentPeriodEnd);
+
+  async function openStripePortal() {
+    setIsOpeningPortal(true);
+    setPortalError(null);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || !data.url) {
+        setPortalError(data.error ?? "No pudimos abrir el portal");
+        setIsOpeningPortal(false);
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      setPortalError("Error de red. Inténtalo de nuevo.");
+      setIsOpeningPortal(false);
+    }
+  }
 
   const title = isPlus
     ? "Gracias por suscribirte a Rial"
@@ -632,7 +653,16 @@ function SubscriptionSection({
           </p>
         </div>
 
-        {isPlus ? (
+        {isPlus && isStripe ? (
+          <Button
+            variant="secondary"
+            className="shrink-0"
+            isDisabled={isOpeningPortal}
+            onPress={openStripePortal}
+          >
+            {isOpeningPortal ? "Abriendo…" : "Administrar suscripción"}
+          </Button>
+        ) : isPlus ? (
           <Button
             variant="secondary"
             className="shrink-0"
@@ -658,7 +688,7 @@ function SubscriptionSection({
         )}
       </div>
 
-      {isPlus && !isCancelling && (
+      {isPlus && !isCancelling && !isStripe && (
         <>
           <div
             className="h-px w-full"
@@ -688,6 +718,12 @@ function SubscriptionSection({
             </Button>
           </div>
         </>
+      )}
+
+      {portalError && (
+        <p className="text-sm" style={{ color: "rgb(220, 38, 38)" }}>
+          {portalError}
+        </p>
       )}
 
       <PlanChangeModal

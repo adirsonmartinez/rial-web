@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import {
   CircleCheck,
@@ -180,6 +180,7 @@ export function CheckoutResultView({
 }) {
   const [status, setStatus] = useState<CheckoutResultStatus>(initialStatus);
   const confettiFiredRef = useRef(false);
+  const router = useRouter();
 
   usePlusActivationPolling(status === "pending", () => {
     setStatus("success");
@@ -230,12 +231,7 @@ export function CheckoutResultView({
           variant="primary"
           fullWidth
           className="h-12"
-          render={(props) => (
-            <Link
-              {...(props as unknown as React.ComponentProps<typeof Link>)}
-              href={config.primaryCta.href}
-            />
-          )}
+          onPress={() => router.push(config.primaryCta.href)}
         >
           {config.primaryCta.label}
         </Button>
@@ -245,12 +241,7 @@ export function CheckoutResultView({
             variant="secondary"
             fullWidth
             className="h-12"
-            render={(props) => (
-              <Link
-                {...(props as unknown as React.ComponentProps<typeof Link>)}
-                href={config.secondaryCta!.href}
-              />
-            )}
+            onPress={() => router.push(config.secondaryCta!.href)}
           >
             {config.secondaryCta.label}
           </Button>

@@ -2,6 +2,15 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type SubscriptionPlan = "free" | "plus";
 
+export type SubscriptionProvider =
+  | "venflow"
+  | "stripe"
+  | "apple"
+  | "google"
+  | "revenuecat"
+  | "manual"
+  | "r4conecta";
+
 export type BillingCycle =
   | "monthly"
   | "quarterly"
@@ -10,6 +19,7 @@ export type BillingCycle =
 
 export type SubscriptionInfo = {
   plan: SubscriptionPlan;
+  provider: SubscriptionProvider | null;
   billingCycle: BillingCycle | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
@@ -17,6 +27,7 @@ export type SubscriptionInfo = {
 
 export const FREE_SUBSCRIPTION: SubscriptionInfo = {
   plan: "free",
+  provider: null,
   billingCycle: null,
   currentPeriodEnd: null,
   cancelAtPeriodEnd: false,
@@ -28,12 +39,16 @@ export async function getSubscriptionInfo(
 ): Promise<SubscriptionInfo> {
   const { data } = await supabase
     .from("subscriptions")
-    .select("status, billing_cycle, current_period_end, cancel_at_period_end")
+    .select(
+      "status, billing_cycle, current_period_end, cancel_at_period_end, provider",
+    )
     .eq("user_id", userId)
-    .eq("provider", "venflow")
+    .in("status", ["active", "trialing"])
+    .order("current_period_end", { ascending: false, nullsFirst: false })
+    .limit(1)
     .maybeSingle();
 
-  if (!data || data.status !== "active") {
+  if (!data) {
     return FREE_SUBSCRIPTION;
   }
 
@@ -52,6 +67,7 @@ export async function getSubscriptionInfo(
 
   return {
     plan: "plus",
+    provider: (data.provider as SubscriptionProvider | null) ?? null,
     billingCycle: data.billing_cycle as BillingCycle | null,
     currentPeriodEnd,
     cancelAtPeriodEnd,
